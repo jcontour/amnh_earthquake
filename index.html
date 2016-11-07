@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Earthquake Discovery</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="geoxml3.js"></script>
+    <script>
+      var map;
+      function initMap() {
+        var styledMapType = new google.maps.StyledMapType(
+        [{"featureType":"all","elementType":"labels.text","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#f1efe8"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"gamma":"1.19"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"gamma":"0.00"},{"weight":"2.07"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#b2ac83"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#b2ac83"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#8ac0c4"}]}, {"featureType": 'water', "elementType": 'labels.text.fill', "stylers": [{"color": '#135960'}]}, { "featureType": 'poi.park', "elementType": 'geometry.fill', "stylers": [{"color": '#dde3c2'}] }],
+          {name: 'Styled Map'}
+          );
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 38.996, lng: -98.769},
+          zoom: 3,
+          mapTypeControlOptions: {
+            mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
+                    'styled_map']
+          }
+        });
+
+        map.mapTypes.set('styled_map', styledMapType);
+        map.setMapTypeId('styled_map');
+
+        var myParser = new geoXML3.parser({map: map});
+        myParser.parse('plate_boundaries.kml');
+
+        // var kmlLayer = new google.maps.KmlLayer();
+        // var src = 'plate-boundaries.kml';
+        // var kmlLayer = new google.maps.KmlLayer(src, {
+        //   suppressInfoWindows: true,
+        //   preserveViewport: false,
+        //   map: map
+        // });
+
+        // var tectonicLayer = new google.maps.KmlLayer({
+        //   url: 'plate_boundaries.kml',
+        // });
+        // tectonicLayer.setMap(map);
+
+        var script = document.createElement('script');
+        script.src = 'https://developers.google.com/maps/documentation/javascript/examples/json/earthquake_GeoJSONP.js';
+        // script.src = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
+        document.getElementsByTagName('head')[0].appendChild(script);
+
+        map.data.setStyle(function(feature) {
+          var magnitude = feature.getProperty('mag');
+          return {
+            icon: getCircle(magnitude)
+          };
+        });
+
+      }
+
+      function getCircle(magnitude) {
+        return {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: 'red',
+          fillOpacity: .2,
+          scale: Math.pow(2, magnitude) / 2,
+          strokeColor: 'white',
+          strokeWeight: 0
+        };
+      }
+
+      function eqfeed_callback(results) {
+        map.data.addGeoJson(results);
+      }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAybjS0_dwQVO_HSl0Xl_H0qoC7n1mW57g&libraries=visualization&callback=initMap"
+    async defer></script>
+  </body>
+</html>
