@@ -7,6 +7,15 @@
     <style>
       #map {
         height: 100%;
+        position: relative;
+        z-index: 0;
+      }
+      #buttons{
+        position: fixed;
+        display: inline-block;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
       }
       html, body {
         height: 100%;
@@ -17,10 +26,16 @@
   </head>
   <body>
     <div id="map"></div>
+    <div id="buttons">
+      <button id="button-red"> red </button>
+      <button id="button-blue"> blue </button>
+    </div>
+    
     <script src="geoxml3.js"></script>
     <script>
       var map;
       function initMap() {
+
         var styledMapType = new google.maps.StyledMapType(
         [{"featureType":"all","elementType":"labels.text","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#f1efe8"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"gamma":"1.19"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"gamma":"0.00"},{"weight":"2.07"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#b2ac83"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#b2ac83"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#8ac0c4"}]}, {"featureType": 'water', "elementType": 'labels.text.fill', "stylers": [{"color": '#135960'}]}, { "featureType": 'poi.park', "elementType": 'geometry.fill', "stylers": [{"color": '#dde3c2'}] }],
           {name: 'Styled Map'}
@@ -29,6 +44,7 @@
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 38.996, lng: -98.769},
           zoom: 3,
+          disableDefaultUI: true,
           mapTypeControlOptions: {
             mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
                     'styled_map']
@@ -41,37 +57,27 @@
         var myParser = new geoXML3.parser({map: map});
         myParser.parse('plate_boundaries.kml');
 
-        // var kmlLayer = new google.maps.KmlLayer();
-        // var src = 'plate-boundaries.kml';
-        // var kmlLayer = new google.maps.KmlLayer(src, {
-        //   suppressInfoWindows: true,
-        //   preserveViewport: false,
-        //   map: map
-        // });
-
-        // var tectonicLayer = new google.maps.KmlLayer({
-        //   url: 'plate_boundaries.kml',
-        // });
-        // tectonicLayer.setMap(map);
-
-        var script = document.createElement('script');
-        script.src = 'https://developers.google.com/maps/documentation/javascript/examples/json/earthquake_GeoJSONP.js';
-        // script.src = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
-        document.getElementsByTagName('head')[0].appendChild(script);
-
+        map.data.loadGeoJson('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson', null, function(results){
+          console.log(results);
+        });
+        
         map.data.setStyle(function(feature) {
-          var magnitude = feature.getProperty('mag');
+          var mag = feature.getProperty('mag');
           return {
-            icon: getCircle(magnitude)
+            icon: getCircle(mag, '#CC3E23')
           };
         });
+        
 
+        // map.data.addFeature
+
+        addListeners(map.data);
       }
 
-      function getCircle(magnitude) {
+      function getCircle(magnitude, color) {
         return {
           path: google.maps.SymbolPath.CIRCLE,
-          fillColor: 'red',
+          fillColor: color,
           fillOpacity: .2,
           scale: Math.pow(2, magnitude) / 2,
           strokeColor: 'white',
@@ -80,7 +86,21 @@
       }
 
       function eqfeed_callback(results) {
-        map.data.addGeoJson(results);
+        var resultArray = []
+        for (var i = 0; i < results.length; i ++){
+          resultArray.push(results[i]);
+        }
+        console.log(resultArray)
+        // map.data.addGeoJson(results);
+      }
+
+      function addListeners(data){
+        document.getElementById('button-blue').addEventListener('click', function(){
+        });
+
+        document.getElementById('button-red').addEventListener('click', function(){
+        });
+
       }
 
     </script>
