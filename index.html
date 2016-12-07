@@ -32,8 +32,10 @@
     </div>
     
     <script src="geoxml3.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
       var map;
+
       function initMap() {
 
         var styledMapType = new google.maps.StyledMapType(
@@ -57,48 +59,27 @@
         var myParser = new geoXML3.parser({map: map});
         myParser.parse('plate_boundaries.kml');
 
-        map.data.loadGeoJson('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson', null, function(results){
-          console.log(results);
-        });
-        
-        map.data.setStyle(function(feature) {
-          var mag = feature.getProperty('mag');
-          return {
-            icon: getCircle(mag, '#CC3E23')
-          };
-        });
-        
+        var eq_feed = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson';
 
-        // map.data.addFeature
+        $(document).ready(function(){
+          $.getJSON(eq_feed, function(data) {
+            for (var i = 0; i < 500; i++) {
+              // obtain the attribues of each marker
+              var item = data.features[i];
+              var location = new google.maps.LatLng(item.geometry.coordinates[0], item.geometry.coordinates[0]);
+              var magnitude = item.properties.mag;
+              var time = item.properties.time;
 
-        addListeners(map.data);
-      }
+              var marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                // title: name,
+                zIndex: Math.round(location.lat()*-100000)<<5
+              });
+            
 
-      function getCircle(magnitude, color) {
-        return {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: color,
-          fillOpacity: .2,
-          scale: Math.pow(2, magnitude) / 2,
-          strokeColor: 'white',
-          strokeWeight: 0
-        };
-      }
-
-      function eqfeed_callback(results) {
-        var resultArray = []
-        for (var i = 0; i < results.length; i ++){
-          resultArray.push(results[i]);
-        }
-        console.log(resultArray)
-        // map.data.addGeoJson(results);
-      }
-
-      function addListeners(data){
-        document.getElementById('button-blue').addEventListener('click', function(){
-        });
-
-        document.getElementById('button-red').addEventListener('click', function(){
+            }
+          });
         });
 
       }

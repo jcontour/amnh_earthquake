@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Earthquake Discovery</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100%;
+        position: relative;
+        z-index: 0;
+      }
+      #buttons{
+        position: fixed;
+        display: inline-block;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="buttons">
+      <button id="button-red"> BIG EARTHQUAKES </button>
+      <button id="button-blue"> RECENT EARTHQUAKES </button>
+    </div>
+    
+    <script src="geoxml3.js"></script>  <!-- tool for xml parsing -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="map-tools.min.js"></script>  <!-- wrapper for gmaps to help with filtering -->
+    <script>
+      var map;
+
+      function initMap() {
+
+        //setting style for map appearance
+        var styledMapType = new google.maps.StyledMapType(
+        [{"featureType":"all","elementType":"labels.text","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#f1efe8"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"gamma":"1.19"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"gamma":"0.00"},{"weight":"2.07"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#b2ac83"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#b2ac83"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#8ac0c4"}]}, {"featureType": 'water', "elementType": 'labels.text.fill', "stylers": [{"color": '#135960'}]}, { "featureType": 'poi.park', "elementType": 'geometry.fill', "stylers": [{"color": '#dde3c2'}] }],
+          {name: 'Styled Map'}
+          );
+
+        //instantiating map centered on USA
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 38.996, lng: -98.769},
+          zoom: 2,
+          disableDefaultUI: true,
+          mapTypeControlOptions: {
+            mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
+                    'styled_map']
+          }
+        });
+
+        map.mapTypes.set('styled_map', styledMapType);
+        map.setMapTypeId('styled_map');
+
+        //parsing XML for plate boundaries
+        var myParser = new geoXML3.parser({map: map});
+        myParser.parse('plate_boundaries.kml');
+
+        var eq_feed = 'http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
+
+        var script = document.createElement('script');
+        script.setAttribute('src', eq_feed);
+        document.getElementsByTagName('head')[0].appendChild(script);
+
+        //looping through data to get times for setting opacity
+        var times = [];
+        $.getJSON(eq_feed, function(data) {
+          for (var i = 0; i < data.features.length; i++) {
+            times.push(data.features[i].properties.time);
+          }
+          // adding geojson to map
+          map.data.addGeoJson(data);
+        });
+
+        times.sort();
+
+        // styling geojson data
+        map.data.setStyle(function(feature) {
+
+          //color mapping based on magnitude
+          //http://hslpicker.com/
+          var low = [100, 95, 50];   // lower magnitudes are yellow
+          var high = [1, 95, 50];  // higher magnitudes are red
+          var minMag = 0.5;
+          var maxMag = 7.0;
+
+          // fraction represents where the value sits between the min and max magnitude
+          var fraction = (Math.min(feature.getProperty('mag'), maxMag) - minMag) /
+              (maxMag - minMag);
+
+          var color = interpolateHsl(low, high, fraction);
+
+          //exponentially scaling based on magnitude
+          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.05;
+          return /** @type {google.maps.Data.StyleOptions} */({
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: mag,
+              fillColor: color,
+              fillOpacity: mapOpacity(feature.getProperty('time'), times),
+              strokeWeight: 0
+            }
+          });
+        });
+      }
+
+      function interpolateHsl(lowHsl, highHsl, fraction) {
+        var color = [];
+        for (var i = 0; i < 3; i++) {
+          // Calculate color based on the fraction.
+          color[i] = (highHsl[i] - lowHsl[i]) * fraction + lowHsl[i];
+        }
+
+        return 'hsl(' + color[0] + ',' + color[1] + '%,' + color[2] + '%)';
+      }
+
+      //setting opacity based on how recent the earthquake was
+      function mapOpacity(x, time_array){
+        var in_min = time_array[0];
+        var in_max = time_array[time_array.length - 1];
+        var out_min = 0.1;
+        var out_max = 0.9;
+        // console.log(x, in_min, in_max)
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+      }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAybjS0_dwQVO_HSl0Xl_H0qoC7n1mW57g&libraries=visualization&callback=initMap"
+    async defer></script>
+  </body>
+</html>
