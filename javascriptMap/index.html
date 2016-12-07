@@ -41,14 +41,14 @@
 
         //setting style for map appearance
         var styledMapType = new google.maps.StyledMapType(
-        [{"featureType":"all","elementType":"labels.text","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#f1efe8"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"gamma":"1.19"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"gamma":"0.00"},{"weight":"2.07"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#b2ac83"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#b2ac83"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#8ac0c4"}]}, {"featureType": 'water', "elementType": 'labels.text.fill', "stylers": [{"color": '#135960'}]}, { "featureType": 'poi.park', "elementType": 'geometry.fill', "stylers": [{"color": '#dde3c2'}] }],
+        [{"featureType":"all","elementType":"labels.text","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#EFF0E6"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"gamma":"1.19"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"gamma":"0.00"},{"weight":"2.07"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#b2ac83"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#b2ac83"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#8ac0c4"}]}, {"featureType": 'water', "elementType": 'labels.text.fill', "stylers": [{"color": '#135960'}]}, { "featureType": 'poi.park', "elementType": 'geometry.fill', "stylers": [{"color": '#dde3c2'}] }],
           {name: 'Styled Map'}
           );
 
         //instantiating map centered on USA
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 38.996, lng: -98.769},
-          zoom: 2,
+          zoom: 3,
           disableDefaultUI: true,
           mapTypeControlOptions: {
             mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
@@ -88,8 +88,8 @@
           //http://hslpicker.com/
           var low = [100, 95, 50];   // lower magnitudes are yellow
           var high = [1, 95, 50];  // higher magnitudes are red
-          var minMag = 0.5;
-          var maxMag = 7.0;
+          var minMag = 1.0;
+          var maxMag = 6.0;
 
           // fraction represents where the value sits between the min and max magnitude
           var fraction = (Math.min(feature.getProperty('mag'), maxMag) - minMag) /
@@ -98,7 +98,7 @@
           var color = interpolateHsl(low, high, fraction);
 
           //exponentially scaling based on magnitude
-          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.05;
+          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
           return /** @type {google.maps.Data.StyleOptions} */({
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
