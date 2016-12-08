@@ -27,6 +27,7 @@
   <body>
     <div id="map"></div>
     <div id="buttons">
+      <button id="button-all"> SHOW ALL EARTHQUAKES </button>
       <button id="button-red"> BIG EARTHQUAKES </button>
       <button id="button-blue"> RECENT EARTHQUAKES </button>
     </div>
@@ -74,6 +75,7 @@
         $.getJSON(eq_feed, function(data) {
           for (var i = 0; i < data.features.length; i++) {
             times.push(data.features[i].properties.time);
+            // console.log(data.features[i].properties.time)
           }
           // adding geojson to map
           map.data.addGeoJson(data);
@@ -111,15 +113,48 @@
             });
         });
       }
+
+      $('#button-all').on('click', function(){
+        map.data.setStyle(function(feature) {
+          //color mapping based on magnitude
+          //http://hslpicker.com/
+          var low = [100, 95, 50];   // lower magnitudes are yellow
+          var high = [1, 95, 50];  // higher magnitudes are red
+          var minMag = 1.0;
+          var maxMag = 6.0;
+
+          // fraction represents where the value sits between the min and max magnitude
+          var fraction = (Math.min(feature.getProperty('mag'), maxMag) - minMag) /
+              (maxMag - minMag);
+
+          var color = interpolateHsl(low, high, fraction);
+
+          //exponentially scaling based on magnitude
+          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
+          return /** @type {google.maps.Data.StyleOptions} */({
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: mag,
+                fillColor: color,
+                fillOpacity: mapOpacity(feature.getProperty('time'), times),
+                strokeWeight: 0
+              }
+            });
+        });
+      })
       
       $('#button-red').on('click', function(){
        
         map.data.setStyle(function(feature) {
           var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
           var opacity;
+
+
           //setting color based on magnitude
-          if (feature.getProperty('mag') > 5) { opacity = .8}
-          else { opacity = 0}
+          if (feature.getProperty('mag') > 5) { console.log(feature)
+            opacity = mapOpacity(feature.getProperty('time'), times) }
+          else { opacity = 0 }
+
 
           return /** @type {google.maps.Data.StyleOptions} */({
             icon: {
@@ -138,18 +173,16 @@
           var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
           var opacity;
           
-
-          //---------------------------------------- NOT WORKING??
           var today = new Date();
-          var recent_range = Date.parse(today.getFullYear(), today.getMonth(), today.getDate() - 1);
           var eq_date = new Date(feature.getProperty('time'));
-          if (eq_date < Date.parse(recent_range)){
+
+          var timediff = (Math.abs(today.getTime() - eq_date.getTime()))/(1000 * 60 * 60 * 24);
+          // console.log("time diff = " + timediff)
+          if (timediff > 2.9){
             opacity = 0;
           } else {
-            opacity = 0.8;
+            opacity = mapOpacity(feature.getProperty('time'), times);
           }
-          //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-          //----------------------------------------
 
           var low = [100, 95, 50];   // lower magnitudes are yellow
           var high = [1, 95, 50];  // higher magnitudes are red
@@ -187,8 +220,8 @@
       function mapOpacity(x, time_array){
         var in_min = time_array[0];
         var in_max = time_array[time_array.length - 1];
-        var out_min = 0.1;
-        var out_max = 0.9;
+        var out_min = 0.9;
+        var out_max = 0.1;
         // console.log(x, in_min, in_max)
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
       }
