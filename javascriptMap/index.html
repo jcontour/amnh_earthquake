@@ -28,15 +28,14 @@
     <div id="map"></div>
     <div id="buttons">
       <button id="button-all"> SHOW ALL EARTHQUAKES </button>
-      <button id="button-red"> BIG EARTHQUAKES </button>
-      <button id="button-blue"> RECENT EARTHQUAKES </button>
+      <button id="button-big"> BIG EARTHQUAKES </button>
+      <button id="button-recent"> RECENT EARTHQUAKES </button>
     </div>
     
     <script src="geoxml3.js"></script>  <!-- tool for xml parsing -->
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
       var map;
-      var showOnlyBig = false;
       var times = [];
 
       function initMap() {
@@ -73,6 +72,7 @@
 
         //looping through data to get times for setting opacity
         $.getJSON(eq_feed, function(data) {
+          times = [];
           for (var i = 0; i < data.features.length; i++) {
             times.push(data.features[i].properties.time);
             // console.log(data.features[i].properties.time)
@@ -85,23 +85,13 @@
 
         // styling geojson data
         map.data.setStyle(function(feature) {
-
-
-          //color mapping based on magnitude
-          //http://hslpicker.com/
-          var low = [100, 95, 50];   // lower magnitudes are yellow
-          var high = [1, 95, 50];  // higher magnitudes are red
-          var minMag = 1.0;
-          var maxMag = 6.0;
-
-          // fraction represents where the value sits between the min and max magnitude
-          var fraction = (Math.min(feature.getProperty('mag'), maxMag) - minMag) /
-              (maxMag - minMag);
-
-          var color = interpolateHsl(low, high, fraction);
+          
+          var color = interpolateHsl(Math.min(feature.getProperty('mag')));
 
           //exponentially scaling based on magnitude
-          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
+          var mag = calculateSize(feature.getProperty('mag'));
+          // var mag = feature.getProperty('mag')*3;
+          // var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.1;
           return /** @type {google.maps.Data.StyleOptions} */({
               icon: {
                 path: google.maps.SymbolPath.CIRCLE,
@@ -115,103 +105,76 @@
       }
 
       $('#button-all').on('click', function(){
-        map.data.setStyle(function(feature) {
-          //color mapping based on magnitude
-          //http://hslpicker.com/
-          var low = [100, 95, 50];   // lower magnitudes are yellow
-          var high = [1, 95, 50];  // higher magnitudes are red
-          var minMag = 1.0;
-          var maxMag = 6.0;
-
-          // fraction represents where the value sits between the min and max magnitude
-          var fraction = (Math.min(feature.getProperty('mag'), maxMag) - minMag) /
-              (maxMag - minMag);
-
-          var color = interpolateHsl(low, high, fraction);
-
-          //exponentially scaling based on magnitude
-          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
-          return /** @type {google.maps.Data.StyleOptions} */({
-              icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: mag,
-                fillColor: color,
-                fillOpacity: mapOpacity(feature.getProperty('time'), times),
-                strokeWeight: 0
-              }
-            });
-        });
-      })
-      
-      $('#button-red').on('click', function(){
-       
-        map.data.setStyle(function(feature) {
-          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
-          var opacity;
-
-
-          //setting color based on magnitude
-          if (feature.getProperty('mag') > 5) { console.log(feature)
-            opacity = mapOpacity(feature.getProperty('time'), times) }
-          else { opacity = 0 }
-
-
-          return /** @type {google.maps.Data.StyleOptions} */({
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: mag,
-              fillColor: 'red',
-              fillOpacity: opacity,
-              strokeWeight: 0
-            }
-          });
-        });
-      })
-
-      $('#button-blue').on('click', function(){
-        map.data.setStyle(function(feature) {
-          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
-          var opacity;
+        map.data.revertStyle();
+        // map.data.setStyle(function(feature) {
           
-          var today = new Date();
-          var eq_date = new Date(feature.getProperty('time'));
-
-          var timediff = (Math.abs(today.getTime() - eq_date.getTime()))/(1000 * 60 * 60 * 24);
-          // console.log("time diff = " + timediff)
-          if (timediff > 2.9){
-            opacity = 0;
-          } else {
-            opacity = mapOpacity(feature.getProperty('time'), times);
-          }
-
-          var low = [100, 95, 50];   // lower magnitudes are yellow
-          var high = [1, 95, 50];  // higher magnitudes are red
-          var minMag = 1.0;
-          var maxMag = 6.0;
-
-          // fraction represents where the value sits between the min and max magnitude
-          var fraction = (Math.min(feature.getProperty('mag'), maxMag) - minMag) /
-              (maxMag - minMag);
-
-          var color = interpolateHsl(low, high, fraction);
-
-          return /** @type {google.maps.Data.StyleOptions} */({
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: mag,
-              fillColor: color,
-              fillOpacity: opacity,
-              strokeWeight: 0
-            }
-          });
-        });
+        //   var color = interpolateHsl(Math.min(feature.getProperty('mag')));
+        //   // var mag = feature.getProperty('mag')*3;
+        //   // var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.1;
+        //   return ({
+        //       icon: {
+        //         path: google.maps.SymbolPath.CIRCLE,
+        //         scale: mag,
+        //         fillColor: color,
+        //         fillOpacity: mapOpacity(feature.getProperty('time'), times),
+        //         strokeWeight: 0
+        //       }
+        //     });
+        // });
       })
 
-      function interpolateHsl(lowHsl, highHsl, fraction) {
+      //---------------------------------------------------------------------NOT WORKING
+      
+      $('#button-big').on('click', function(){
+       map.data.revertStyle();
+       map.data.forEach(function(feature){
+          var mag = feature.getProperty('mag');
+          if (mag < 5) { map.data.overrideStyle(feature, {fillOpacity: 0}); }
+       })
+
+      })
+
+      //---------------------------------------------------------------------NOT WORKING
+
+      $('#button-recent').on('click', function(){
+        map.data.revertStyle();
+
+        var today = new Date();
+
+        map.data.forEach(function(feature){
+          var mag = calculateSize(feature.getProperty('mag'));
+          var eq_date = new Date(feature.getProperty('time'));
+          var timediff = (Math.abs(today.getTime() - eq_date.getTime()))/(1000 * 60 * 60 * 24);
+
+          if (timediff > 2.9){ map.data.overrideStyle(feature, {fillOpacity: 0}); } 
+        })
+          
+      })
+
+      //---------------------------------------------------------------------^^^^^
+
+      //calculating size based on magnitude
+      function calculateSize(mag){
+        if (mag > 3) {
+          return Math.exp(mag) * 0.08
+        } else {
+          return mag*3
+        }
+      }
+
+      //calculating color of dot based on magnitude
+      function interpolateHsl(mag) {
+        var low = [70, 95, 50];   // lower magnitudes are yellow
+        var high = [1, 95, 50];  // higher magnitudes are red
+        var minMag = 1.0;
+        var maxMag = 6.0;
+
+        var fraction = (Math.min(mag, maxMag) - minMag) /
+            (maxMag - minMag)
+
         var color = [];
         for (var i = 0; i < 3; i++) {
-          // Calculate color based on the fraction.
-          color[i] = (highHsl[i] - lowHsl[i]) * fraction + lowHsl[i];
+          color[i] = (high[i] - low[i]) * fraction + low[i];
         }
         return 'hsl(' + color[0] + ',' + color[1] + '%,' + color[2] + '%)';
       }
