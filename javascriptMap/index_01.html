@@ -27,14 +27,16 @@
   <body>
     <div id="map"></div>
     <div id="buttons">
-      <button id="button-red"> BIG EARTHQUAKES </button>
-      <button id="button-blue"> RECENT EARTHQUAKES </button>
+      <button id="button-all"> SHOW ALL EARTHQUAKES </button>
+      <button id="button-big"> BIG EARTHQUAKES </button>
+      <button id="button-recent"> RECENT EARTHQUAKES </button>
     </div>
     
     <script src="geoxml3.js"></script>  <!-- tool for xml parsing -->
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
       var map;
+      var times = [];
 
       function initMap() {
 
@@ -69,10 +71,11 @@
         document.getElementsByTagName('head')[0].appendChild(script);
 
         //looping through data to get times for setting opacity
-        var times = [];
         $.getJSON(eq_feed, function(data) {
+          times = [];
           for (var i = 0; i < data.features.length; i++) {
             times.push(data.features[i].properties.time);
+            // console.log(data.features[i].properties.time)
           }
           // adding geojson to map
           map.data.addGeoJson(data);
@@ -82,53 +85,74 @@
 
         // styling geojson data
         map.data.setStyle(function(feature) {
-
-          //color mapping based on magnitude
-          //http://hslpicker.com/
-          var low = [100, 95, 50];   // lower magnitudes are yellow
-          var high = [1, 95, 50];  // higher magnitudes are red
-          var minMag = 1.0;
-          var maxMag = 6.0;
-
-          // fraction represents where the value sits between the min and max magnitude
-          var fraction = (Math.min(feature.getProperty('mag'), maxMag) - minMag) /
-              (maxMag - minMag);
-
-          var color = interpolateHsl(low, high, fraction);
+          
+          var color = interpolateHsl(Math.min(feature.getProperty('mag')));
 
           //exponentially scaling based on magnitude
-          var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.08;
+          var mag = calculateSize(feature.getProperty('mag'));
+          // var mag = feature.getProperty('mag')*3;
+          // var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.1;
           return /** @type {google.maps.Data.StyleOptions} */({
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: mag,
-              fillColor: color,
-              fillOpacity: mapOpacity(feature.getProperty('time'), times),
-              strokeWeight: 0
-            }
-          });
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: mag,
+                fillColor: color,
+                fillOpacity: mapOpacity(feature.getProperty('time'), times),
+                strokeWeight: 0
+              }
+            });
         });
       }
 
-      function interpolateHsl(lowHsl, highHsl, fraction) {
-        var color = [];
-        for (var i = 0; i < 3; i++) {
-          // Calculate color based on the fraction.
-          color[i] = (highHsl[i] - lowHsl[i]) * fraction + lowHsl[i];
-        }
+      $('#button-all').on('click', function(){
+        map.data.revertStyle();
+        // map.data.setStyle(function(feature) {
+          
+        //   var color = interpolateHsl(Math.min(feature.getProperty('mag')));
+        //   // var mag = feature.getProperty('mag')*3;
+        //   // var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.1;
+        //   return ({
+        //       icon: {
+        //         path: google.maps.SymbolPath.CIRCLE,
+        //         scale: mag,
+        //         fillColor: color,
+        //         fillOpacity: mapOpacity(feature.getProperty('time'), times),
+        //         strokeWeight: 0
+        //       }
+        //     });
+        // });
+      })
 
-        return 'hsl(' + color[0] + ',' + color[1] + '%,' + color[2] + '%)';
-      }
+      //---------------------------------------------------------------------NOT WORKING
+      
+      $('#button-big').on('click', function(){
+       map.data.revertStyle();
+       map.data.forEach(function(feature){
+          var mag = feature.getProperty('mag');
+          if (mag < 5) { map.data.overrideStyle(feature, {fillOpacity: 0}); }
+       })
 
-      //setting opacity based on how recent the earthquake was
-      function mapOpacity(x, time_array){
-        var in_min = time_array[0];
-        var in_max = time_array[time_array.length - 1];
-        var out_min = 0.1;
-        var out_max = 0.9;
-        // console.log(x, in_min, in_max)
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-      }
+      })
+
+      //---------------------------------------------------------------------NOT WORKING
+
+      $('#button-recent').on('click', function(){
+        map.data.revertStyle();
+
+        var today = new Date();
+
+        map.data.forEach(function(feature){
+          var mag = calculateSize(feature.getProperty('mag'));
+          var eq_date = new Date(feature.getProperty('time'));
+          var timediff = (Math.abs(today.getTime() - eq_date.getTime()))/(1000 * 60 * 60 * 24);
+
+          if (timediff > 2.9){ map.data.overrideStyle(feature, {fillOpacity: 0}); } 
+        })
+          
+      })
+
+      //---------------------------------------------------------------------^^^^^
+
 
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAybjS0_dwQVO_HSl0Xl_H0qoC7n1mW57g&libraries=visualization&callback=initMap"

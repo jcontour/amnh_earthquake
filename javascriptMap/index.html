@@ -36,6 +36,7 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
       var map;
+      var showOnlyBig = false;
       var times = [];
 
       function initMap() {
@@ -72,7 +73,6 @@
 
         //looping through data to get times for setting opacity
         $.getJSON(eq_feed, function(data) {
-          times = [];
           for (var i = 0; i < data.features.length; i++) {
             times.push(data.features[i].properties.time);
             // console.log(data.features[i].properties.time)
@@ -85,13 +85,11 @@
 
         // styling geojson data
         map.data.setStyle(function(feature) {
-          
+
           var color = interpolateHsl(Math.min(feature.getProperty('mag')));
 
           //exponentially scaling based on magnitude
           var mag = calculateSize(feature.getProperty('mag'));
-          // var mag = feature.getProperty('mag')*3;
-          // var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.1;
           return /** @type {google.maps.Data.StyleOptions} */({
               icon: {
                 path: google.maps.SymbolPath.CIRCLE,
@@ -102,63 +100,92 @@
               }
             });
         });
+
       }
 
       $('#button-all').on('click', function(){
-        map.data.revertStyle();
-        // map.data.setStyle(function(feature) {
+        map.data.setStyle(function(feature) {
           
-        //   var color = interpolateHsl(Math.min(feature.getProperty('mag')));
-        //   // var mag = feature.getProperty('mag')*3;
-        //   // var mag = Math.exp(parseFloat(feature.getProperty('mag'))) * 0.1;
-        //   return ({
-        //       icon: {
-        //         path: google.maps.SymbolPath.CIRCLE,
-        //         scale: mag,
-        //         fillColor: color,
-        //         fillOpacity: mapOpacity(feature.getProperty('time'), times),
-        //         strokeWeight: 0
-        //       }
-        //     });
-        // });
+          var color = interpolateHsl(Math.min(feature.getProperty('mag')));
+          var mag = calculateSize(feature.getProperty('mag'));
+          return ({
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: mag,
+                fillColor: color,
+                fillOpacity: mapOpacity(feature.getProperty('time'), times),
+                strokeWeight: 0
+              }
+            });
+        });
       })
 
-      //---------------------------------------------------------------------NOT WORKING
       
       $('#button-big').on('click', function(){
-       map.data.revertStyle();
-       map.data.forEach(function(feature){
-          var mag = feature.getProperty('mag');
-          if (mag < 5) { map.data.overrideStyle(feature, {fillOpacity: 0}); }
-       })
+       
+        map.data.setStyle(function(feature) {
+          var mag = calculateSize(feature.getProperty('mag'));
+          var opacity;
+
+          //setting color based on magnitude
+          // if (feature.getProperty('mag') < 5) {
+          //   map.data.overrideStyle(feature, { fillColor: "black" });
+          // }
+
+
+          if (feature.getProperty('mag') > 5) {
+            opacity = mapOpacity(feature.getProperty('time'), times) 
+          } else { opacity = 0 }
+
+
+          return ({
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: mag,
+              fillColor: 'red',
+              fillOpacity: opacity,
+              strokeWeight: 0
+            }
+          });
+        });
 
       })
 
-      //---------------------------------------------------------------------NOT WORKING
-
       $('#button-recent').on('click', function(){
-        map.data.revertStyle();
-
-        var today = new Date();
-
-        map.data.forEach(function(feature){
+        map.data.setStyle(function(feature) {
           var mag = calculateSize(feature.getProperty('mag'));
+          var opacity;
+          
+          var today = new Date();
           var eq_date = new Date(feature.getProperty('time'));
           var timediff = (Math.abs(today.getTime() - eq_date.getTime()))/(1000 * 60 * 60 * 24);
 
-          if (timediff > 2.9){ map.data.overrideStyle(feature, {fillOpacity: 0}); } 
-        })
-          
-      })
+          if (timediff > 2.9){
+            opacity = 0;
+          } else {
+            opacity = mapOpacity(feature.getProperty('time'), times);
+          }
 
-      //---------------------------------------------------------------------^^^^^
+          var color = interpolateHsl(Math.min(feature.getProperty('mag')));
+
+          return ({
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: mag,
+              fillColor: color,
+              fillOpacity: opacity,
+              strokeWeight: 0
+            }
+          });
+        });
+      })
 
       //calculating size based on magnitude
       function calculateSize(mag){
         if (mag > 3) {
-          return Math.exp(mag) * 0.08
+          return Math.exp(mag) * 0.05
         } else {
-          return mag*3
+          return mag*1.5
         }
       }
 
@@ -184,7 +211,7 @@
         var in_min = time_array[0];
         var in_max = time_array[time_array.length - 1];
         var out_min = 0.9;
-        var out_max = 0.1;
+        var out_max = 0.2;
         // console.log(x, in_min, in_max)
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
       }
