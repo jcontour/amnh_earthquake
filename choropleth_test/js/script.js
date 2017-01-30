@@ -113,8 +113,7 @@ var projection = d3.geoOrthographic()
     .translate([width / 2, height / 2])
     .scale(250)
     .clipAngle(90)
-    .precision(0.1)
-    .rotate([0, -30]);
+    .precision(0.1);
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -157,7 +156,21 @@ d3.json("topojsondata/countries-and-states.json", function(error, world) {
                    return projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[1];
            })
            .attr("r", 5)
-           .style("fill", "red");
+           .style("fill", "red")
+           .attr("opacity", function(d) {
+                var geoangle = d3.geoDistance(
+                        d.geometry.coordinates,
+                        [
+                            -projection.rotate()[0],
+                            projection.rotate()[1]
+                        ]);
+                if (geoangle > 1.57079632679490)
+                {
+                    return "0";
+                } else {
+                    return "1.0";
+                }
+            });
     });
     
 });
@@ -212,7 +225,22 @@ function dragged(){
     var gpos1 = projection.invert(d3.mouse(this));
     o0 = projection.rotate();
     var o1 = eulerAngles(gpos0, gpos1, o0);
-    projection.rotate(o1);
+    // console.log(o1);
+
+    projection.rotate(o1);                            //normal rotation
+    
+    // projection.rotate([o1[0], o1[1], 0]);                //limiting "tumble"
+    
+    // projection.rotate([o1[0], function(){             //trying to limit tilt + tumble but not working
+    //         if (o1[1] > 15) {
+    //             return 15;
+    //         } else if (o1[1] < -15) {
+    //             return -15;
+    //         } else {
+    //             return o1[1];
+    //         }
+    //     }, 0]);
+    
     svg.selectAll("path")
         .attr("d", path.projection(projection));
 
@@ -222,14 +250,40 @@ function dragged(){
         var self = d3.select(this)
         self.attr("cx", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[0])
         self.attr("cy", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[1])
+        self.attr("opacity", function(d) {
+                var geoangle = d3.geoDistance(
+                        d.geometry.coordinates,
+                        [
+                            -projection.rotate()[0],
+                            projection.rotate()[1]
+                        ]);
+                if (geoangle > 1.57079632679490)
+                {
+                    return "0";
+                } else {
+                    return "1.0";
+                }
+            });
     })
-
-
 
 }
 
 function dragended(){
 
+}
+
+function calcOpacity(){
+    g.selectAll("circle")
+        .attr("opacity", function(d){
+        var geoangle = d3.geoDistance( d.geometry.coordinates,
+                [ -projection.rotate()[0], projection.rotate()[1] ]);
+        if (geoangle > 1.57079632679490)
+        {
+            return "0";
+        } else {
+            return "1.0";
+        };
+    })
 }
 
 var zoom = d3.zoom()
@@ -238,8 +292,12 @@ var zoom = d3.zoom()
         g.selectAll("path")  
             .attr("d", path.projection(projection)); 
         g.selectAll("circle")
-            .attr("d", path.projection(projection))
-});
+            .attr("d", path.projection(projection));
+            // .attr("opacity", calcOpacity(d))
+        calcOpacity();
+        })
+
+       
 
 svg.call(zoom)
 
