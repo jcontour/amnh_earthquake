@@ -1,29 +1,34 @@
+body {
+  padding: 0px;
+  margin: 0px;
+  background-color: #101326;
+}
+
 svg {
     width: 100%
 }
 
 path {
     fill: none;
-    stroke: black
+    stroke: #2B3541;
 }
 
-.background {
-  fill: rgba(200,212,220,.5);
+.ocean {
+  fill: #546672;
   stroke-width: .8px;
-  stroke: black;
+  stroke: white;
 }
 
-.graticule {
-    stroke: rgba(0,0,0, .2);
+.latlon {
+    stroke: rgba(0,0,0, .5);
     stroke-width: .2px;
 }
 
 .country .land, .state .land {
-    fill: white;
-    stroke: rgba(0,0,0, .2);
+    fill: #B6BFBA;
     stroke-width .3px;
 }
 
 g {
-    fill: #222;
+    fill: #91b65d;
 }
