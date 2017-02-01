@@ -2,6 +2,7 @@ body {
   padding: 0px;
   margin: 0px;
   background-color: #101326;
+  font-family: sans-serif;
 }
 
 svg {
@@ -31,4 +32,15 @@ path {
 
 g {
     fill: #91b65d;
+}
+
+#filters {
+  display: inline;
+  position: fixed;
+  top: 10px;
+  left: 20px;
+}
+
+label {
+  color: white;
 }

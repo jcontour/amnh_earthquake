@@ -1,7 +1,7 @@
 var app = app || {};
 
 app.main = (function() {
-	
+
 	// --------------------------------------------------------------------------------------------------------------------------------------------
 	//                                          D3 MAP CODE
 	// --------------------------------------------------------------------------------------------------------------------------------------------
@@ -28,6 +28,7 @@ app.main = (function() {
 
 	var setup = function(){
 		document.getElementById("nTime").value = "1";
+		document.getElementById("nSize").value = "1";
 
 		var width = window.innerWidth,
 		    height = window.innerHeight;
