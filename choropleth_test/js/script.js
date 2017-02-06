@@ -24,14 +24,18 @@ app.main = (function() {
 	    return color(time)
 	}
 
-	var projection, svg, path, g;
+	var projection, svg, path, g, label;
 
 	var setup = function(){
 		document.getElementById("nTime").value = "1";
-		document.getElementById("nSize").value = "1";
+		document.getElementById("nSize").value = "0";
 
 		var width = window.innerWidth,
 		    height = window.innerHeight;
+
+		label = d3.select("body").append("div")
+			.attr("class", "label")
+			.style("opacity", 0);
 
 		projection = d3.geoOrthographic()
 		    .translate([width / 2, height / 2])
@@ -137,7 +141,24 @@ app.main = (function() {
 	            } else {
 	                return "0.8";
 	            }
-	        });
+	        })
+	        .on("mouseover", function(d){
+	        	if (d3.select(this).style("opacity") > 0 ){
+
+		       		label.transition()
+		       			.duration(200)
+		       			.style("opacity", .9)
+		       		label .html(d.properties.title)
+		       		.style("left", (d3.event.pageX) + "px")		
+	                .style("top", (d3.event.pageY) + "px");
+	       			}
+	       		})
+	        .on("mouseout", function(d){
+	        	label.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+	        })
+	       ;
 	}
 
 	// --------------------------------------------------------------------------------------------------------------------------------------------
@@ -164,13 +185,19 @@ app.main = (function() {
 		d3.select("#nTime").on("input", function() {		// time filter
 			setOpacity();
 		})
+
+		d3.select("#nSize").on("input", function() {		// time filter
+			setOpacity();
+		})
 	}
 
 	var setOpacity = function(){
-		var filterNum = document.getElementById("nTime").value;
+		var filterTime = document.getElementById("nTime").value;
+		var filterSize = document.getElementById("nSize").value;
 
 		var nodes = g.selectAll("circle")
 			.attr("opacity", function(d){
+				// console.log(d.properties)
 				var geoangle = d3.geoDistance(
 		            d.geometry.coordinates,
 		            [
@@ -178,24 +205,24 @@ app.main = (function() {
 		                projection.rotate()[1]
 		            ]);
 
-				if (geoangle > 1.57079632679490) {
+				if (geoangle > 1.57079632679490 || d.properties.mag < filterSize) {
                 	return "0";
            		} else {
-					if(filterNum == 1){
+					if(filterTime == 1){
 				        return "0.8"
-				    } else if (filterNum == 2) {
+				    } else if (filterTime == 2) {
 				        if (d.properties.time > thisyear) {
 				            return "0.8"
 				        } else {
 				            return "0"
 				        }
-				    } else if (filterNum == 3) {
+				    } else if (filterTime == 3) {
 				        if (d.properties.time > thismonth) {
 				            return "0.8"
 				        } else {
 				            return "0"
 				        }
-				    } else if (filterNum == 4) {
+				    } else if (filterTime == 4) {
 				        if (d.properties.time > thisweek) {
 				            return "0.8"
 				        } else {
