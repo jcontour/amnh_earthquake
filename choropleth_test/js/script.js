@@ -7,10 +7,10 @@ app.main = (function() {
 	// --------------------------------------------------------------------------------------------------------------------------------------------
 	
 	var today = Date.now()
-	var thisday = today - (1000*60*60*24)           	// TIMES ARE CURRENTLY SCALED FOR TESTING ONE WEEK OF DATA
-	var thisweek = today - (1000*60*60*24*2)            // USE OTHER SET OF VARIABLES BELOW FOR ONE YEAR OF DATA
-	var thismonth = today - (1000*60*60*24*3)       
-	var thisyear = today - (1000*60*60*24*4)
+	var thisday = today - (1000*60*60*24)           	// TIMES ARE CURRENTLY SCALED FOR TESTING ONE MONTH OF DATA
+	var thisweek = today - (1000*60*60*24*7)            // USE OTHER SET OF VARIABLES BELOW FOR ONE YEAR OF DATA
+	var thismonth = today - (1000*60*60*24*14)       
+	var thisyear = today - (1000*60*60*24*21)
 	// var thisday = today - (1000*60*60*24)           // millis * sec * min * hours
 	// var thisweek = today - (1000*60*60*24*7)        // millis * sec * min * hour * days
 	// var thismonth = today - (1000*60*60*24*7*4)     // millis * sec * min * hour * day * weeks
@@ -24,7 +24,7 @@ app.main = (function() {
 	    return color(time)
 	}
 
-	var projection, svg, path, g, label;
+	var projection, svg, path, g, label, eq_size;
 
 	var setup = function(){
 		document.getElementById("nTime").value = "1";
@@ -63,10 +63,15 @@ app.main = (function() {
 		      .attr('class', 'latlon')
 		      .attr('d', path);
 
-		// var eq_size = d3.scaleLinear()			// scaling size of data to magnitude
+		// eq_size = d3.scaleLinear()			// scaling size of data to magnitude
 		//     .domain([2,7])
 		//     .range([1,25])
 		//     .clamp(true);
+
+		 eq_size = d3.scalePow().exponent(3)
+		 	.domain([1, 7])
+		 	.range([1, 50])
+		 	.clamp(true);
 
 		d3.json("topojsondata/countries-and-states.json", function(error, world) {		// drawing map
 		    console.log("getting map data")
@@ -78,8 +83,11 @@ app.main = (function() {
 		    
 		});
 
-		d3.json('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson', function(error, data) {              // load/draw EARTHQUAKES
+		d3.json('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson', function(error, data) {              // load/draw EARTHQUAKES
     		console.log("getting eq data");
+    		data.features.sort( function(a, b) { 
+    			return d3.ascending(a.properties.time, b.properties.time)
+    		});
     		drawData(data.features);
     	});
 
@@ -115,6 +123,11 @@ app.main = (function() {
 	       .data(data)
 	       .enter()
 	       .append("circle")
+	       .attr("class", function(d){
+	       		if (d.properties.time > thisday){
+	       			return "new-eq";
+	       		}
+	       })
 	       .attr("cx", function(d) {
 	               return projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[0];
 	       })
@@ -122,8 +135,9 @@ app.main = (function() {
 	               return projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[1];
 	       })
 	       .attr("r", function(d){
-	            // return eq_size(d.properties.mag);
-	            return Math.exp(parseFloat(d.properties.mag)) * 0.08 + 2
+	            return eq_size(d.properties.mag);
+
+	            // return Math.exp(parseFloat(d.properties.mag)) * 0.05 + 2
 	       })
 	       .style("fill", function(d){
 	            return eq_color(d.properties.time);
@@ -139,27 +153,26 @@ app.main = (function() {
 	            {
 	                return "0";
 	            } else {
-	                return "0.8";
+	                return "0.7";
 	            }
 	        })
 	        .on("mouseover", function(d){
 	        	if (d3.select(this).style("opacity") > 0 ){
-
-		       		label.transition()
-		       			.duration(200)
-		       			.style("opacity", .9)
+					label.style("opacity", .9)
 		       		label .html(d.properties.title)
 		       		.style("left", (d3.event.pageX) + "px")		
 	                .style("top", (d3.event.pageY) + "px");
 	       			}
 	       		})
 	        .on("mouseout", function(d){
-	        	label.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
+	        	label.style("opacity", 0);	
 	        })
 	       ;
 	}
+
+	// var sortData = function(data){
+	// 	data.sort(function(a, b){ return d3.ascending(a.finished_at, b.finished_at);
+	// }
 
 	// --------------------------------------------------------------------------------------------------------------------------------------------
 	//                                          INTERACTION EVENTS
@@ -209,28 +222,28 @@ app.main = (function() {
                 	return "0";
            		} else {
 					if(filterTime == 1){
-				        return "0.8"
+				        return "0.7"
 				    } else if (filterTime == 2) {
 				        if (d.properties.time > thisyear) {
-				            return "0.8"
+				            return "0.7"
 				        } else {
 				            return "0"
 				        }
 				    } else if (filterTime == 3) {
 				        if (d.properties.time > thismonth) {
-				            return "0.8"
+				            return "0.7"
 				        } else {
 				            return "0"
 				        }
 				    } else if (filterTime == 4) {
 				        if (d.properties.time > thisweek) {
-				            return "0.8"
+				            return "0.7"
 				        } else {
 				            return "0"
 				        }
 				    } else {
 				        if (d.properties.time > thisday) {
-				            return "0.8"
+				            return "0.7"
 				        } else {
 				            return "0"
 				        }
