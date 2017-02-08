@@ -11,13 +11,13 @@ svg {
 
 path {
     fill: none;
-    stroke: #2B3541;
+    /*stroke: #2B3541;*/
 }
 
 .ocean {
   fill: #546672;
   stroke-width: .8px;
-  stroke: white;
+  /*stroke: white;*/
 }
 
 .latlon {
@@ -25,13 +25,23 @@ path {
     stroke-width: .2px;
 }
 
-.country .land, .state .land {
+/*.country .land, .state .land {*/
+.land {
     fill: #B6BFBA;
-    stroke-width .3px;
+    stroke-width: .8px;
+    stroke: rgb(100,100,100);
 }
 
-g {
-    fill: #91b65d;
+.maplabel{
+  color: rgb(130, 130, 130);
+  font-size: 5pt;
+}
+
+.plates .land{
+    fill: none;
+    stroke-width: 1px;
+    stroke: black;
+    stroke-dasharray: "5, 5";
 }
 
 #filters {

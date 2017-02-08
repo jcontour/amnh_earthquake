@@ -73,15 +73,20 @@ app.main = (function() {
 		 	.range([1, 50])
 		 	.clamp(true);
 
-		d3.json("topojsondata/countries-and-states.json", function(error, world) {		// drawing map
+		d3.json("topojsondata/countries-and-states.json", function(error, data) {		// drawing map
 		    console.log("getting map data")
-		    states = topojson.feature(world, world.objects.states).features;
-		    countries = topojson.feature(world, world.objects.countries).features;
+		    states = topojson.feature(data, data.objects.states).features;
+		    countries = topojson.feature(data, data.objects.countries).features;
 		    
-		    stateSet = drawMap('state', states);
-		    countrySet = drawMap('country', countries);
+		    stateSet = drawMap('state', states, true);
+		    countrySet = drawMap('country', countries, true);
 		    
 		});
+
+		d3.json("topojsondata/tec_boundaries.json", function(error, data){
+			console.log("getting tectonic plate data")
+			tectonicSet = drawMap('plates', data.features, false)
+		})
 
 		d3.json('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson', function(error, data) {              // load/draw EARTHQUAKES
     		console.log("getting eq data");
@@ -93,7 +98,7 @@ app.main = (function() {
 
 	}
 
-	function drawMap(className, featureSet) {
+	function drawMap(className, featureSet, drawLabels) {
 		console.log("drawing " + className)
 	    var set  = g.selectAll('.' + className)
 	        .data(featureSet)
@@ -114,6 +119,34 @@ app.main = (function() {
 	    set.append('path')
 	        .attr('class', 'overlay')
 	        .attr('d', path)
+
+	    // set.append('text')
+	    // 	.attr('class', 'maplabel')    
+	    // 	.attr('transform', function(d) {
+	    //         return "translate(" + path.centroid(d) + ")";
+	    //     })
+	    //     .style('text-anchor', 'middle')
+	    //     .text(function(d) {
+	    //         return d.properties.name
+	    //     });
+
+	 //    if (drawLabels) {
+	 //    set.append('text')
+		// 	.attr('class', 'maplabel')
+		// 	// .attr("x", function(d){
+		//         // return path.centroid(d)[0];
+		//     // })
+		//     .attr("transform", function(d){
+		//         // return  path.centroid(d)[1];
+		//         return "translate(" + path.centroid(d) + ")";
+		//     })
+		// 	.text(function(d) {
+		// 		return d.properties.name;
+		// 	})
+		// 	.style('text-anchor', 'middle')
+		// 	;
+		// }
+
 	    return set;
 	}
 
@@ -267,14 +300,28 @@ app.main = (function() {
 	    projection.rotate([o1[0], o1[1], 0]);                   //limiting "tumble"    
 	    svg.selectAll("path")
 	        .attr("d", path.projection(projection));
+	    
+	    // var labels = g.selectAll("maplabel")
+	    // labels.each(function(d,i){
+	    // 	var self = d3.select(this)
+	    // 	self.attr("transform", function(d){ return "translate(" + path.centroid(d) + ")"; })
+    	// })
 
-	    var nodes = g.selectAll("circle")
+	    var nodes = svg.selectAll("circle")
 	   
 	    nodes.each(function(d, i) {
 	        var self = d3.select(this)
 	        self.attr("cx", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[0])
 	        self.attr("cy", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[1])
 	    })
+
+	    // var labels = g.selectAll('text')
+	    // labels.each(function(d, i) {
+	    //     var self = d3.select(this)
+	    //     self.attr("cx", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[0])
+	    //     self.attr("cy", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[1])
+	    // })
+
 
 	    setOpacity();
 	}
