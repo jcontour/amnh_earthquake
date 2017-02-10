@@ -96,6 +96,14 @@ app.main = (function() {
     		drawData(data.features);
     	});
 
+		// GETTING RETM DATA
+		d3.request('http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=function_name')
+		    // .header("X-Requested-With", "XMLHttpRequest")
+		    .header("Access-Control-Allow-Origin", "*")
+		    .get(function(error, data){
+		    	console.log(data);
+		    });
+
 	}
 
 	function drawMap(className, featureSet, drawLabels) {
@@ -152,11 +160,19 @@ app.main = (function() {
 
 	function drawData(data){
 		console.log("drawing data")
+
+
+
 		var nodes = g.selectAll("circle")
 	       .data(data)
 	       .enter()
 	       .append("circle")
 	       .attr("class", function(d){
+	       		//TESTING SOMETHING FOR RETM
+	   //     		if (d.properties.place.includes("Papua New Guinea") && d.properties.mag > 6){
+				// 	console.log(d)
+				// }
+
 	       		if (d.properties.time > thisday){
 	       			return "new-eq";
 	       		}
