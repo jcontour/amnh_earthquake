@@ -23,6 +23,7 @@ path {
 .latlon {
     stroke: rgba(0,0,0, .5);
     stroke-width: .2px;
+    stroke-dasharray: 5;
 }
 
 /*.country .land, .state .land {*/
@@ -41,7 +42,6 @@ path {
     fill: none;
     stroke-width: 1px;
     stroke: black;
-    stroke-dasharray: "5, 5";
 }
 
 #filters {
@@ -71,7 +71,7 @@ div.label {
 
 @keyframes new-eq-pulse {
     0% {stroke-width: 0;}
-    50% {stroke-width: 2;}
+    50% {stroke-width: 4;}
     100% {stroke-width: 0;}
 }
 

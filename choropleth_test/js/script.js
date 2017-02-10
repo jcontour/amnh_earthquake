@@ -78,8 +78,8 @@ app.main = (function() {
 		    states = topojson.feature(data, data.objects.states).features;
 		    countries = topojson.feature(data, data.objects.countries).features;
 		    
-		    stateSet = drawMap('state', states, true);
-		    countrySet = drawMap('country', countries, true);
+		    stateSet = drawMap('state map', states, true);
+		    countrySet = drawMap('country map', countries, true);
 		    
 		});
 
@@ -97,17 +97,18 @@ app.main = (function() {
     	});
 
 		// GETTING RETM DATA
-		d3.request('http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=function_name')
-		    // .header("X-Requested-With", "XMLHttpRequest")
-		    .header("Access-Control-Allow-Origin", "*")
-		    .get(function(error, data){
-		    	console.log(data);
-		    });
+		// d3.request('http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=function_name')
+		//     // .header("X-Requested-With", "XMLHttpRequest")
+		//     .header("Access-Control-Allow-Origin", "*")
+		//     .get(function(error, data){
+		//     	console.log(data);
+		//     });
 
 	}
 
 	function drawMap(className, featureSet, drawLabels) {
 		console.log("drawing " + className)
+		// console.log(featureSet)
 	    var set  = g.selectAll('.' + className)
 	        .data(featureSet)
 	        .enter()
@@ -122,7 +123,11 @@ app.main = (function() {
 
 	    set.append('path')
 	        .attr('class', 'land')
-	        .attr('d', path);
+	        .attr('d', path)
+	        .attr('id', function(d) {
+	            return d.properties.name;
+	        })
+	        ;
 
 	    set.append('path')
 	        .attr('class', 'overlay')
@@ -234,6 +239,19 @@ app.main = (function() {
 		    .on("end", dragended);
 		svg.call(drag);
 
+		// var drag = d3.drag()
+		// 	.origin(Object)
+  //           .on('drag', function(d) {
+  //   	        projection.rotate([(d.x = d3.event.x) / 2, -(d.y = d3.event.y) / 2]);
+  //               svg.selectAll('path').attr('d', function(u) {
+  //               // The circles are not properly generated when the
+  //               // projection has the clipAngle option set.
+  //                   return path(u) ? path(u) : 'M 10 10';
+  //               });
+  //           });
+  //       svg.call(drag);
+
+
 		var zoom = d3.zoom()								// zoom on map
 		    .on("zoom",function() {
 		        g.attr("transform", d3.event.transform)
@@ -251,11 +269,39 @@ app.main = (function() {
 		d3.select("#nSize").on("input", function() {		// time filter
 			setOpacity();
 		})
+
+		$('#test').on("click", function(){
+			rotateTo("Papua New Guinea");
+		})
+	}
+
+	function rotateTo(place){
+		var loc = d3.select("#" + place)
+		console.log(loc);
+		// (function transition() {
+		    d3.transition()
+		        .duration(1250)
+		        .tween("rotate", function() {
+		          
+		          var p = d3.geo.centroid(locPath),
+		              r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
+		          return function(t) {
+		            projection.rotate(r(t));
+		          };
+		        })
+		        ;
+		  // })();
 	}
 
 	var setOpacity = function(){
 		var filterTime = document.getElementById("nTime").value;
 		var filterSize = document.getElementById("nSize").value;
+
+		// g.selectAll('circle').attr('d', function(u) {
+	 //        // The circles are not properly generated when the
+	 //        // projection has the clipAngle option set.
+	 //            return path(u) ? path(u) : 'M 10 10';
+	 //        });
 
 		var nodes = g.selectAll("circle")
 			.attr("opacity", function(d){
