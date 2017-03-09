@@ -89,7 +89,7 @@ app.main = (function() {
 		})
 
 		d3.json('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson', function(error, data) {              // load/draw EARTHQUAKES
-    		console.log("getting eq data");
+    		console.log("getting eq data!");
     		data.features.sort( function(a, b) { 
     			return d3.ascending(a.properties.time, b.properties.time)
     		});
@@ -104,6 +104,11 @@ app.main = (function() {
 		//     	console.log(data);
 		//     });
 
+		d3.json("js/retm_data.json", function(error, data){					// WILL NEED TO REPLACE THIS WITH ACTUAL LINK WHEN PUBLISHING
+			console.log("getting RETM data")
+			// console.log(data)
+		})
+
 	}
 
 	function drawMap(className, featureSet, drawLabels) {
@@ -114,18 +119,23 @@ app.main = (function() {
 	        .enter()
 	        .append('g')
 	        .attr('class', className)
-	        .attr('data-name', function(d) {
-	            return d.properties.name;
-	        })
-	        .attr('data-id', function(d) {
-	            return d.id;
-	        });
+	        // .attr('data-name', function(d) {
+	        //     return d.properties.name;
+	        // })
+	        // .attr('data-id', function(d) {
+	        //     return d.id;
+	        // })
+	        ;
 
 	    set.append('path')
 	        .attr('class', 'land')
 	        .attr('d', path)
 	        .attr('id', function(d) {
-	            return d.properties.name;
+	            var name = d.properties.name;
+	            name = name.replace(/\s+/g, '');
+	            name = name.toLowerCase()
+	            console.log(name)
+	            return name;
 	        })
 	        ;
 
@@ -270,27 +280,36 @@ app.main = (function() {
 			setOpacity();
 		})
 
-		$('#test').on("click", function(){
-			rotateTo("Papua New Guinea");
+		$('#test1').on("click", function(){
+			rotateTo("brazil");
+		})
+		$('#test2').on("click", function(){
+			rotateTo("papuanewguinea");
+		})
+		$('#test3').on("click", function(){
+			rotateTo("saudiarabia");
 		})
 	}
 
 	function rotateTo(place){
 		var loc = d3.select("#" + place)
-		console.log(loc);
-		// (function transition() {
+		console.log(loc)
+		var p = d3.geoPath().centroid(loc.datum())
+		
+		console.log(p)
+
+
 		    d3.transition()
-		        .duration(1250)
+		        .duration(2000)
 		        .tween("rotate", function() {
-		          
-		          var p = d3.geo.centroid(locPath),
-		              r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
-		          return function(t) {
-		            projection.rotate(r(t));
-		          };
+		        	r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
+					return function(t) {
+						projection.rotate(r(t));
+						updateElements();	
+						setOpacity();
+						};
 		        })
 		        ;
-		  // })();
 	}
 
 	var setOpacity = function(){
@@ -360,6 +379,17 @@ app.main = (function() {
 
 	    // projection.rotate(o1);                               //normal rotation
 	    projection.rotate([o1[0], o1[1], 0]);                   //limiting "tumble"    
+
+	    updateElements();
+
+
+	    setOpacity();
+	}
+
+	function dragended(){
+	}
+
+	function updateElements(){
 	    svg.selectAll("path")
 	        .attr("d", path.projection(projection));
 	    
@@ -383,12 +413,6 @@ app.main = (function() {
 	    //     self.attr("cx", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[0])
 	    //     self.attr("cy", projection([d.geometry.coordinates[0], d.geometry.coordinates[1]])[1])
 	    // })
-
-
-	    setOpacity();
-	}
-
-	function dragended(){
 	}
 
 	// --------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,303 @@
+{ "retm": [  
+      {  
+         "iris_dmc_event_id":"9993759",
+         "region":"Papua New Guinea",
+         "short_region":"Papua New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/4409"
+      },
+      {  
+         "iris_dmc_event_id":"9953968",
+         "region":"Philippines",
+         "short_region":"Philippines",
+         "retm_page":"//www.iris.edu/hq/retm/4388"
+      },
+      {  
+         "iris_dmc_event_id":"9948944",
+         "region":"Southern Chile",
+         "short_region":"Chile",
+         "retm_page":"//www.iris.edu/hq/retm/4384"
+      },
+      {  
+         "iris_dmc_event_id":"9946716",
+         "region":"Papua New Guinea",
+         "short_region":"Papua New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/4380"
+      },
+      {  
+         "iris_dmc_event_id":"9912119",
+         "region":"Solomon Islands",
+         "short_region":"Solomon Islands",
+         "retm_page":"//www.iris.edu/hq/retm/4367"
+      },
+      {  
+         "iris_dmc_event_id":"5198717",
+         "region":"El Salvador",
+         "short_region":"El Salvador",
+         "retm_page":"//www.iris.edu/hq/retm/4347"
+      },
+      {  
+         "iris_dmc_event_id":"5197722",
+         "region":"New Zealand",
+         "short_region":"New Zealand",
+         "retm_page":"//www.iris.edu/hq/retm/4330"
+      },
+      {  
+         "iris_dmc_event_id":"5192066",
+         "region":"Off Coast of New Zealand",
+         "short_region":"New Zealand",
+         "retm_page":"//www.iris.edu/hq/retm/4217"
+      },
+      {  
+         "iris_dmc_event_id":"5191763",
+         "region":"North of Ascension Island",
+         "short_region":"Ascension Island",
+         "retm_page":"//www.iris.edu/hq/retm/4211"
+      },
+      {  
+         "iris_dmc_event_id":"5191298",
+         "region":"Italy",
+         "short_region":"Italy",
+         "retm_page":"//www.iris.edu/hq/retm/4208"
+      },
+      {  
+         "iris_dmc_event_id":"5190904",
+         "region":"South Georgia Island Region",
+         "short_region":"S Georgia Island",
+         "retm_page":"//www.iris.edu/hq/retm/4206"
+      },
+      {  
+         "iris_dmc_event_id":"5190300",
+         "region":"New Caledonia",
+         "short_region":"New Caledonia",
+         "retm_page":"//www.iris.edu/hq/retm/4204"
+      },
+      {  
+         "iris_dmc_event_id":"5189231",
+         "region":"Mariana Islands",
+         "short_region":"Mariana Islands",
+         "retm_page":"//www.iris.edu/hq/retm/4189"
+      },
+      {  
+         "iris_dmc_event_id":"5183973",
+         "region":"South Sandwich Islands",
+         "short_region":"South Sandwich Islands",
+         "retm_page":"//www.iris.edu/hq/retm/4150"
+      },
+      {  
+         "iris_dmc_event_id":"5181222",
+         "region":"Vanuatu",
+         "short_region":"Vanuatu",
+         "retm_page":"//www.iris.edu/hq/retm/4113"
+      },
+      {  
+         "iris_dmc_event_id":"5180176",
+         "region":"Near the Coast of Ecuador",
+         "short_region":"Ecuador",
+         "retm_page":"//www.iris.edu/hq/retm/4101"
+      },
+      {  
+         "iris_dmc_event_id":"5180038",
+         "region":"Japan",
+         "short_region":"Japan",
+         "retm_page":"//www.iris.edu/hq/retm/4100"
+      },
+      {  
+         "iris_dmc_event_id":"5176028",
+         "region":"Indonesia",
+         "short_region":"Indonesia",
+         "retm_page":"//www.iris.edu/hq/retm/4022"
+      },
+      {  
+         "iris_dmc_event_id":"5172800",
+         "region":"Kamchatka, Russia",
+         "short_region":"Russia",
+         "retm_page":"//www.iris.edu/hq/retm/3965"
+      },
+      {  
+         "iris_dmc_event_id":"5172125",
+         "region":"Southern Alaska",
+         "short_region":"Alaska",
+         "retm_page":"//www.iris.edu/hq/retm/3957"
+      },
+      {  
+         "iris_dmc_event_id":"5167397",
+         "region":"Tajikistan",
+         "short_region":"Tajikistan",
+         "retm_page":"//www.iris.edu/hq/retm/3880"
+      },
+      {  
+         "iris_dmc_event_id":"5167174",
+         "region":"SE Indian Ridge",
+         "short_region":"SE Indian Ridge",
+         "retm_page":"//www.iris.edu/hq/retm/3876"
+      },
+      {  
+         "iris_dmc_event_id":"5166216",
+         "region":"Peru",
+         "short_region":"Peru",
+         "retm_page":"//www.iris.edu/hq/retm/3865"
+      },
+      {  
+         "iris_dmc_event_id":"5165520",
+         "region":"Solomon Islands",
+         "short_region":"Solomon Islands",
+         "retm_page":"//www.iris.edu/hq/retm/3859"
+      },
+      {  
+         "iris_dmc_event_id":"5163154",
+         "region":"Afghanistan",
+         "short_region":"Afghanistan",
+         "retm_page":"//www.iris.edu/hq/retm/3779"
+      },
+      {  
+         "iris_dmc_event_id":"5162588",
+         "region":"Vanuatu",
+         "short_region":"Vanuatu",
+         "retm_page":"//www.iris.edu/hq/retm/3768"
+      },
+      {  
+         "iris_dmc_event_id":"5159022",
+         "region":"Offshore Coquimbo, Chile",
+         "short_region":"Chile",
+         "retm_page":"//www.iris.edu/hq/retm/3714"
+      },
+      {  
+         "iris_dmc_event_id":"5153837",
+         "region":"New Guinea",
+         "short_region":"New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/3665"
+      },
+      {  
+         "iris_dmc_event_id":"5153015",
+         "region":"Solomon Islands",
+         "short_region":"Solomon Islands",
+         "retm_page":"//www.iris.edu/hq/retm/3657"
+      },
+      {  
+         "iris_dmc_event_id":"5149647",
+         "region":"Southern Mid-Atlantic Ridge",
+         "short_region":"S Mid-Atlantic",
+         "retm_page":"//www.iris.edu/hq/retm/3584"
+      },
+      {  
+         "iris_dmc_event_id":"5148725",
+         "region":"Bonin Islands, Japan",
+         "short_region":"Bonin Islands, Japan",
+         "retm_page":"//www.iris.edu/hq/retm/3514"
+      },
+      {  
+         "iris_dmc_event_id":"5113514",
+         "region":"Nepal",
+         "short_region":"Nepal",
+         "retm_page":"//www.iris.edu/hq/retm/3451"
+      },
+      {  
+         "iris_dmc_event_id":"5113064",
+         "region":"Papua New Guinea",
+         "short_region":"Papua New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/3394"
+      },
+      {  
+         "iris_dmc_event_id":"5112793",
+         "region":"Papua New Guinea",
+         "short_region":"Papua New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/3382"
+      },
+      {  
+         "iris_dmc_event_id":"5111620",
+         "region":"Nepal",
+         "short_region":"Nepal",
+         "retm_page":"//www.iris.edu/hq/retm/3363"
+      },
+      {  
+         "iris_dmc_event_id":"5108914",
+         "region":"Papua New Guinea",
+         "short_region":"Papua New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/3308"
+      },
+      {  
+         "iris_dmc_event_id":"5007016",
+         "region":"Flores Sea",
+         "short_region":"Flores Sea",
+         "retm_page":"//www.iris.edu/hq/retm/3275"
+      },
+      {  
+         "iris_dmc_event_id":"5005184",
+         "region":"Northern Mid-Atlantic Ridge",
+         "short_region":"Northern Mid-Atlantic Ridge",
+         "retm_page":"//www.iris.edu/hq/retm/3250"
+      },
+      {  
+         "iris_dmc_event_id":"4814839",
+         "region":"Molucca Sea",
+         "short_region":"Molucca Sea",
+         "retm_page":"//www.iris.edu/hq/retm/3047"
+      },
+      {  
+         "iris_dmc_event_id":"4813335",
+         "region":"Fiji",
+         "short_region":"Fiji",
+         "retm_page":"//www.iris.edu/hq/retm/2919"
+      },
+      {  
+         "iris_dmc_event_id":"4768129",
+         "region":"San Francisco Bay Area",
+         "short_region":"San Francisco",
+         "retm_page":"//www.iris.edu/hq/retm/2559"
+      },
+      {  
+         "iris_dmc_event_id":"4722865",
+         "region":"Rat Islands, Aleutian Islands, Alaska",
+         "short_region":"Aleutian Islands",
+         "retm_page":"//www.iris.edu/hq/retm/2388"
+      },
+      {  
+         "iris_dmc_event_id":"4599191",
+         "region":"Papua New Guinea",
+         "short_region":"Papua New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/2285"
+      },
+      {  
+         "iris_dmc_event_id":"4599098",
+         "region":"Guerrero, Mexico",
+         "short_region":"Guerrero, Mexico",
+         "retm_page":"//www.iris.edu/hq/retm/2284"
+      },
+      {  
+         "iris_dmc_event_id":"4598511",
+         "region":"Solomon Islands",
+         "short_region":"Solomon Islands",
+         "retm_page":"//www.iris.edu/hq/retm/2224"
+      },
+      {  
+         "iris_dmc_event_id":"4598364",
+         "region":"Papua New Guinea",
+         "short_region":"Papua New Guinea",
+         "retm_page":"//www.iris.edu/hq/retm/2223"
+      },
+      {  
+         "iris_dmc_event_id":"4597428",
+         "region":"SW of Iquique, Chile",
+         "short_region":"SW of Iquique, Chile",
+         "retm_page":"//www.iris.edu/hq/retm/2211"
+      },
+      {  
+         "iris_dmc_event_id":"4597319",
+         "region":"Northwest of Iquique, Chile",
+         "short_region":"Offshore Chile",
+         "retm_page":"//www.iris.edu/hq/retm/2209"
+      },
+      {  
+         "iris_dmc_event_id":"4368902",
+         "region":"South Atlantic Ocean",
+         "short_region":"South Atlantic Ocean",
+         "retm_page":"//www.iris.edu/hq/retm/2112"
+      },
+      {  
+         "iris_dmc_event_id":"4368729",
+         "region":"Scotia Sea",
+         "short_region":"Scotia Sea",
+         "retm_page":"//www.iris.edu/hq/retm/2107"
+      }
+   ]
+}
