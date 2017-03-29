@@ -1,0 +1,79 @@
+body {
+  padding: 0px;
+  margin: 0px;
+  background-color: #101326;
+  font-family: sans-serif;
+}
+
+svg {
+    width: 100%
+}
+
+path {
+    fill: none;
+}
+
+.ocean {
+  fill: #1C65AD;
+  stroke-width: .8px;
+  /*stroke: white;*/
+}
+
+.latlon {
+    stroke: #268AED;
+    stroke-width: .5px;
+    stroke-dasharray: 5;
+}
+
+/*.country .land, .state .land {*/
+.land {
+    fill: #737D2F;
+    stroke-width: .8px;
+    stroke: #96A33D;
+}
+
+text{
+  color: white;
+  font-size: 5pt;
+}
+
+.plates .land{
+    fill: none;
+    stroke-width: 1px;
+    stroke: black;
+}
+
+#filters {
+  display: inline;
+  position: fixed;
+  top: 10px;
+  left: 20px;
+}
+
+label {
+  color: white;
+}
+
+div.label { 
+    position: absolute;   
+    color: white;  
+    padding: 2px;       
+    font: 12px sans-serif;    
+    border: 0px;    
+    border-radius: 8px;     
+    pointer-events: none;     
+}
+
+@keyframes new-eq-pulse {
+    0% {stroke-width: 0;}
+    50% {stroke-width: 4;}
+    100% {stroke-width: 0;}
+}
+
+circle {position: relative;}
+
+.new-eq {
+  stroke: white;
+  animation: new-eq-pulse 2s linear infinite;
+}
+
