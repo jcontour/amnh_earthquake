@@ -233,11 +233,13 @@ app.main = (function() {
 		        g.selectAll("circle")
 		            .attr("d", path.projection(projection));
 		        })
-			.scaleExtent([1,5])
+			.scaleExtent([1,10])
+
 
 		// console.log(zoom.scale())
 		    
 		svg.call(zoom)
+
 
 		d3.select("#nTime").on("input", function() {		// time filter
 			setOpacity();
