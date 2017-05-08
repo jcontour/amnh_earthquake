@@ -1,0 +1,19 @@
+{ "definitions": [  
+      {  
+         "term" : "Epicenter",
+         "definition" : "definition of epicenter"
+      },
+      {  
+         "term" : "Magnitude",
+         "definition" : "definition of magnitude"
+      },
+      {  
+         "term" : "Seismograph",
+         "definition" : "definition of seismograph"
+      },
+      {  
+         "term" : "Tectonic Plate",
+         "definition" : "definition of tectonic plate"
+      },
+   ]
+}

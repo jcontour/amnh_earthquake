@@ -3,13 +3,49 @@
 <head>
 	<title>eq_map</title>
 	<link rel="stylesheet" href="style.css">
-	<script src="js/d3.min.js"></script>
-	<script src="//d3js.org/d3-tile.v0.0.min.js"></script>
-	<script src="js/jquery-3.1.1.min.js"></script>
-	<script src="js/topojson.min.js"></script>
+	<script src="js/lib/jquery-3.1.1.min.js"></script>
+	<script src="js/lib/d3.min.js"></script>
+	<script src="js/lib/handlebars-v4.0.5.js"></script>
+	<script src="js/lib/topojson.min.js"></script>
 </head>
 <body>
-	<div id="filters">
+	<div id="left_sidebar" class="sidebar">
+		<div class="section">
+			<h2> Search the Data </h2>
+			<hr align="center" width="80%">
+
+		</div>
+		<div class="section">
+			<h2> Question Your Knowledge </h2>
+			<hr align="center" width="80%">
+			<div id="question_container"> </div>
+
+		</div>
+		<div class="section">
+		<h2> Know Your Definitions </h2>
+			<hr align="center" width="80%">
+			<div id="definition_container"> </div>
+		</div>
+	</div>
+	<div id="right_sidebar" class="sidebar">
+		<div class="section">
+			<h2> Recent Earthquake Teachable Moments from IRIS </h2>
+			<hr align="center" width="80%">
+			<div id="retm_container"> </div>
+		</div>
+		<div class="section">
+			<h2> US Array of Seismic Stations </h2>
+			<hr align="center" width="80%">
+
+		</div>
+		<div class="section">
+			<h2> Earthquakes in the News </h2>
+			<hr align="center" width="80%">
+			<div id="news_container"> </div>
+		</div>
+	</div>
+
+	<!-- <div id="filters">
 		<label for="nTime"> filter by time </label>
 	  	<input type="range" min="1" max="5" id="nTime">
 	  	<br>
@@ -18,8 +54,42 @@
 	  	<button id="test1"> FIND BRAZIL </button> 
 	  	<button id="test2"> FIND PAPUA NEW GUINEA </button> 
 	  	<button id="test3"> FIND SAUDI ARABIA </button> 
-	</div>
-    <script src="js/versor.js"></script>
+	</div> -->
+
+
+	<script id="question_template" type="text/x-handlebars-template">
+		{{#each questions}}
+			<div class="entry">
+				<img class="switch" src="" /> <h3> {{name}} </h3>
+				<img class="q_{{@index}}" src="" />
+				<p> {{definition}} </p>
+			</div>
+		{{/each}}
+	</script>
+    
+    <script id="definition_template" type="text/x-handlebars-template">
+    	{{#each definitions}}
+    		<div class="entry">
+	    		<img class="switch" src="" /> <h3> {{term}} </h3>
+    			<p>	{{definition}} </p>
+    	{{/each}}
+	</script>
+
+	<script id="retm_template" type="text/x-handlebars-template">
+		{{#each retm}}
+			<div class="retm-region">
+			{{short_region}}
+
+			</div>
+		{{/each}}
+	</script>
+
+	<script id="news_template" type="text/x-handlebars-template">
+
+	</script>
+
+    <script src="js/lib/versor.js"></script>
+    <script src="js/globe.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

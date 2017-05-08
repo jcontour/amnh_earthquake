@@ -1,7 +1,7 @@
 body {
   padding: 0px;
   margin: 0px;
-  background-color: #101326;
+  background-color: #000E1D;
   font-family: sans-serif;
 }
 
@@ -14,22 +14,22 @@ path {
 }
 
 .ocean {
-  fill: #1C65AD;
+  fill: #003E51;
   stroke-width: .8px;
   /*stroke: white;*/
 }
 
 .latlon {
-    stroke: #268AED;
+    stroke: #10566D;
     stroke-width: .5px;
     stroke-dasharray: 5;
 }
 
 /*.country .land, .state .land {*/
 .land {
-    fill: #737D2F;
+    fill: #799A3D;
     stroke-width: .8px;
-    stroke: #96A33D;
+    stroke: #ACC37E;
 }
 
 text{
