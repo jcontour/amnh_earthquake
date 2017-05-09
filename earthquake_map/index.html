@@ -14,6 +14,15 @@
 			<h2> Search the Data </h2>
 			<hr align="center" width="80%">
 
+			<div id="filters">
+				<label for="nTime"> Explore by time of earthquake </label>
+			  	<input type="range" min="1" max="5" id="nTime">
+			  	<br>
+			  	<label for="nSize"> Explore by earthquake magnitude </label>
+			  	<input type="range" min="0" max="6" id="nSize"><br><br>
+			</div>
+
+
 		</div>
 		<div class="section">
 			<h2> Question Your Knowledge </h2>
@@ -36,7 +45,9 @@
 		<div class="section">
 			<h2> US Array of Seismic Stations </h2>
 			<hr align="center" width="80%">
-
+			<p> This is some info about the US array. What do earthquake waves look like as they travel through the earth? </p>
+			<p> Watch this video of the US Array of seismometers to find out. </p>
+			<div id="usarray">Watch Now</div>
 		</div>
 		<div class="section">
 			<h2> Earthquakes in the News </h2>
@@ -45,23 +56,11 @@
 		</div>
 	</div>
 
-	<!-- <div id="filters">
-		<label for="nTime"> filter by time </label>
-	  	<input type="range" min="1" max="5" id="nTime">
-	  	<br>
-	  	<label for="nSize"> filter by size </label>
-	  	<input type="range" min="0" max="6" id="nSize"><br><br>
-	  	<button id="test1"> FIND BRAZIL </button> 
-	  	<button id="test2"> FIND PAPUA NEW GUINEA </button> 
-	  	<button id="test3"> FIND SAUDI ARABIA </button> 
-	</div> -->
-
-
 	<script id="question_template" type="text/x-handlebars-template">
 		{{#each questions}}
 			<div class="entry">
 				<img class="switch" src="" /> <h3> {{name}} </h3>
-				<img class="q_{{@index}}" src="" />
+				<!-- <img class="" src="" /> -->
 				<p> {{definition}} </p>
 			</div>
 		{{/each}}
@@ -85,7 +84,9 @@
 	</script>
 
 	<script id="news_template" type="text/x-handlebars-template">
-
+		{{#each news}}
+			<div class="news" data-link="{{link}}">{{title}}</div>
+		{{/each}}
 	</script>
 
     <script src="js/lib/versor.js"></script>

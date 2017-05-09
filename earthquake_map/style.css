@@ -3,6 +3,7 @@ body {
   margin: 0px;
   background-color: #000E1D;
   font-family: sans-serif;
+  color: white;
 }
 
 svg {
@@ -43,19 +44,11 @@ text{
     stroke: black;
 }
 
-#filters {
-  display: inline;
-  position: fixed;
-  top: 10px;
-  left: 20px;
-}
-
 label {
   color: white;
 }
 
 div.label { 
-    position: absolute;   
     color: white;  
     padding: 2px;       
     font: 12px sans-serif;    

@@ -20,7 +20,7 @@ var eq_color = function(time) {  // mapping color to time of eq
 
 var projection, svg, path, g, label, eq_size;
 
-var setup = function(){
+var setupGlobe = function(){
 
 	var width = window.innerWidth,
 	    height = window.innerHeight;
@@ -67,6 +67,8 @@ var setup = function(){
 
 }
 
+var placeNames = [];
+
 function drawMap(className, featureSet, drawLabels) {
 	console.log("drawing " + className)
 	var set  = g.selectAll('.' + className)
@@ -86,10 +88,16 @@ function drawMap(className, featureSet, drawLabels) {
         .attr('class', 'land')
         .attr('d', path)
         .attr('id', function(d) {			// setting place name ID for retm rotation
-            var name = d.properties.name;
-            name = name.replace(/\s+/g, '');
-            name = name.toLowerCase()
-            return name;
+        	if (drawLabels){
+	        	var name = d.properties.name;
+	            name = name.replace(/\s+/g, '');
+	            name = name.toLowerCase()
+	            placeNames.push(name)
+	            return name;	
+        	} else {
+        		return;
+        	}
+            
         });
 
     set.append('text')
@@ -103,23 +111,7 @@ function drawMap(className, featureSet, drawLabels) {
             return d.properties.name
         });
 
- //    if (drawLabels) {
- //    set.append('text')
-	// 	.attr('class', 'maplabel')
-	// 	// .attr("x", function(d){
-	//         // return path.centroid(d)[0];
-	//     // })
-	//     .attr("transform", function(d){
-	//         // return  path.centroid(d)[1];
-	//         return "translate(" + path.centroid(d) + ")";
-	//     })
-	// 	.text(function(d) {
-	// 		return d.properties.name;
-	// 	})
-	// 	.style('text-anchor', 'middle')
-	// 	;
-	// }
-
+	// console.log(placeNames);
     return set;
 }
 
@@ -178,13 +170,14 @@ function rotateTo(place){
 
 var setOpacity = function(){
 	// var filterTime = document.getElementById("nTime").value;
+	var filterTime = 1;
 	// var filterSize = document.getElementById("nSize").value;
 
-	// g.selectAll('circle').attr('d', function(u) {
- //        // The circles are not properly generated when the
- //        // projection has the clipAngle option set.
- //            return path(u) ? path(u) : 'M 10 10';
- //        });
+	g.selectAll('circle').attr('d', function(u) {
+        // The circles are not properly generated when the
+        // projection has the clipAngle option set.
+            return path(u) ? path(u) : 'M 10 10';
+        });
 
 	var nodes = g.selectAll("circle")
 		.attr("opacity", function(d){
