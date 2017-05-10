@@ -9,7 +9,14 @@
 	<script src="js/lib/topojson.min.js"></script>
 </head>
 <body>
+
+	<!-- GLOBE -->
+	<div id="globe"> </div>
+
+	<!-- LEFT SIDEBAR -->
 	<div id="left_sidebar" class="sidebar">
+		<h1> Earthquake Explorer </h1>
+
 		<div class="section">
 			<h2> Search the Data </h2>
 			<hr align="center" width="80%">
@@ -21,21 +28,24 @@
 			  	<label for="nSize"> Explore by earthquake magnitude </label>
 			  	<input type="range" min="0" max="6" id="nSize"><br><br>
 			</div>
-
-
 		</div>
+
 		<div class="section">
 			<h2> Question Your Knowledge </h2>
 			<hr align="center" width="80%">
 			<div id="question_container"> </div>
 
 		</div>
+
 		<div class="section">
-		<h2> Know Your Definitions </h2>
+			<h2> Know Your Definitions </h2>
 			<hr align="center" width="80%">
 			<div id="definition_container"> </div>
 		</div>
+	
 	</div>
+	
+	<!-- RIGHT SIDEBAR -->
 	<div id="right_sidebar" class="sidebar">
 		<div class="section">
 			<h2> Recent Earthquake Teachable Moments from IRIS </h2>
@@ -56,6 +66,8 @@
 		</div>
 	</div>
 
+
+	<!-- TEMPLATES -->
 	<script id="question_template" type="text/x-handlebars-template">
 		{{#each questions}}
 			<div class="entry">
@@ -85,7 +97,10 @@
 
 	<script id="news_template" type="text/x-handlebars-template">
 		{{#each news}}
-			<div class="news" data-link="{{link}}">{{title}}</div>
+			<div class="news" data-link="{{filepath}}">
+				<h3> {{title}} </h3>
+				<p> {{publication}} </p>
+			</div>
 		{{/each}}
 	</script>
 

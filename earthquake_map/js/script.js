@@ -4,6 +4,8 @@ app.main = (function() {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ queuing data calls
 	function callGlobeData(){
+		console.log("calling data for globe")
+
 		d3.queue(2)				// calling map data
 		.defer(d3.json, "data/countries-and-states.json")
 		.defer(d3.json, "data/tec_boundaries.json")
@@ -11,13 +13,13 @@ app.main = (function() {
 		.defer(d3.json, "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson")
 		.awaitAll(function(error, results){
 			if (error) throw error;
-			console.log(results)
 			drawGlobeData(results);
 		})
 	}
 
 	function drawGlobeData(data){
-		var mapData = data[0]
+		console.log("drawing globe")
+		var mapData = data[0];
 		
 		var states = topojson.feature(mapData, mapData.objects.states).features;
 	    drawMap('state map', states, true);
@@ -25,66 +27,95 @@ app.main = (function() {
 	    var countries = topojson.feature(mapData, mapData.objects.countries).features;	    
 	    drawMap('country map', countries, true);
 
-		var tectonicPlates = data[1]
-	    drawMap('plates', tectonicPlates.features, false)
+		var tectonicPlates = data[1];
+	    drawMap('plates', tectonicPlates.features, false);
 
-	    var earthquakes = []
-	    for (i = 0; i <data[2].features.length; i++){ earthquakes.push(data[2].features[i]) }
-	    for (i = 0; i <data[3].features.length; i++){ earthquakes.push(data[3].features[i]) }
+	    var earthquakes = [];
+	    // for (i = 0; i <data[2].features.length; i++){ earthquakes.push(data[2].features[i]) }		// UNCOMMENT FOR MAJOR LAG 
+	    for (i = 0; i <data[3].features.length; i++){ earthquakes.push(data[3].features[i]) };
 		earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
 		
-		drawData(earthquakes)
+		drawData(earthquakes);
+
+		initTemplates();
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ instantiating templates
 
-	var retm_template;
+	function initTemplates(){
+		console.log("initializing templates")
 
-	var source   = $("#retm_template").html();
-	var retm_template = Handlebars.compile(source);
+		var source, question_template, definition_template, retm_template, news_template;
+
+		source = $("#question_template").html();
+		question_template = Handlebars.compile(source);
+
+		source = $("#definition_template").html();
+		definition_template = Handlebars.compile(source);
+
+		source = $("#retm_template").html();
+		retm_template = Handlebars.compile(source);
+
+		source = $("#news_template").html();
+		news_template = Handlebars.compile(source);
+
+		d3.queue()
+			.defer(d3.json, "data/defs_and_questions.json")
+			.defer(d3.json, "data/retm_data.json")	// <<<<<<<<<<<<<<< WILL NEED TO REPLACE THIS WITH ACTUAL LINK WHEN PUBLISHING
+
+			// for list of retm entries
+			// http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=function_name
+
+			// page for each entry use iris_dmc_event_id from
+			// http://ds.iris.edu/ds/nodes/dmc/tools/event/###### 
+
+			.awaitAll( function(error, results){
+				console.log("filling templates");
+				// console.log(results);
+
+				showTemplate("#question_container", question_template, results[0]);
+				showTemplate("#definition_container", definition_template, results[0]);
+				showTemplate("#news_container", news_template, results[0])
+
+				filterRETM(results[1], function(filtered){
+					showTemplate("#retm_container", retm_template, filtered); 
+				})
+			})
+
+	}
 
 	function showTemplate(div, template, data){
+		console.log("showing template " + div);
 		$(div).html(template(data));
 	}
 
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RETM
-	// d3.json("js/retm_data.json", function(error, data){					// WILL NEED TO REPLACE THIS WITH ACTUAL LINK WHEN PUBLISHING
-	// 	console.log("getting RETM data")
-	// 	// console.log(data)
-	// 	filterRETM(data, function(filtered){
-	// 		showTemplate("#retm_container", retm_template, filtered)
-	// 	})
-	
-	// })
+	// checking to see if retm location matches a location on the globe
+	// placeNames is an array populated in the drawMap function in globe.js
+	function filterRETM(data, callback) {	
+		var filteredData = [];
+		var namelist = [];
 
-	// function filterRETM(data, callback) {
-	// 	// placeNames is an array populated in the drawMap function in globe.js
-	// 	var filteredData = [];
+		for (var i = 0; i < data['retm'].length; i++) {
+			var name = data['retm'][i].short_region;
+            name = name.replace(/\s+/g, '');
+            name = name.toLowerCase()
 
-	// 	for (var i = 0; i < data.length; i++) {
-	// 		var name = data[i].short_region;
- //            name = name.replace(/\s+/g, '');
- //            name = name.toLowerCase()
+			var locOnGlobe = false;
+			for(var j = 0; j < placeNames.length; j++){
+				// if name matches and location is not already represented in retm
+				if (name == placeNames[j] && $.inArray(name, namelist) == -1) {	
+					// console.log(name)
+					locOnGlobe = true;
+					filteredData.push(data['retm'][i])
+					namelist.push(name)
+					break;
+				}
+			}		
+		}
 
-	// 		var locOnGlobe = false;
-
-	// 		for(var j = 0; j < placeNames.length; j++){
-	// 			if (name == placeNames[j]) {
-	// 				locOnGlobe = true;
-	// 				filteredData.push(data[i])
-	// 				break;
-	// 			}
-	// 		}		
-	// 	}
-
-	// 	console.log(filteredData)
-	// 	callback( filteredData );
-	// }
-
-	// MAKE GET REQUEST TO 
-	// http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=function_name
-
-	// http://ds.iris.edu/ds/nodes/dmc/tools/event/###### - use iris_dmc_event_id to get info for each earthquake. 
+		// console.log(filteredData);
+		callback( {"retm" : filteredData} );
+	}
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION

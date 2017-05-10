@@ -21,13 +21,15 @@ var eq_color = function(time) {  // mapping color to time of eq
 var projection, svg, path, g, label, eq_size;
 
 var setupGlobe = function(){
+	console.log("setting up globe")
 
 	var width = window.innerWidth,
 	    height = window.innerHeight;
 
-	label = d3.select("body").append("div")
-		.attr("class", "label")
-		.style("opacity", 0);
+	    // MOUSEOVER LABEL
+	// label = d3.select("#globe").append("div")
+	// 	.attr("class", "label")
+	// 	.style("opacity", 0);
 
 	projection = d3.geoOrthographic()
 	    .translate([width / 2, height / 2])
@@ -35,7 +37,7 @@ var setupGlobe = function(){
 	    .clipAngle(90)
 	    .precision(0.1);
 
-	svg = d3.select("body").append("svg")
+	svg = d3.select("#globe").append("svg")
 	    .attr("width", width)
 	    .attr("height", height);
 
@@ -71,6 +73,7 @@ var placeNames = [];
 
 function drawMap(className, featureSet, drawLabels) {
 	console.log("drawing " + className)
+	
 	var set  = g.selectAll('.' + className)
         .data(featureSet)
         .enter()
@@ -116,7 +119,8 @@ function drawMap(className, featureSet, drawLabels) {
 }
 
 function drawData(data){
-	console.log("drawing data")
+	console.log("drawing eq data on globe");
+
 	var nodes = g.selectAll("circle")
        .data(data)
        .enter()
@@ -136,25 +140,27 @@ function drawData(data){
             if (geoangle > 1.57079632679490)
             { return "0"; } else { return eq_opacity; }
         })
-        .on("mouseover", function(d){
-        	if (d.properties.time > historical){
-	        	if (d3.select(this).style("opacity") > 0 ){
-					label.style("opacity", .9)
-		       		label .html(d.properties.title)
-		       		.style("left", (d3.event.pageX) + "px")		
-	                .style("top", (d3.event.pageY) + "px");
-	       		}
-	       	}
-    	})
-        .on("mouseout", function(d){
-        	label.style("opacity", 0);	
-        })
+     //    .on("mouseover", function(d){
+     //    	if (d.properties.time > historical){
+	    //     	if (d3.select(this).style("opacity") > 0 ){
+					// label.style("opacity", .9)
+		   //     		label .html(d.properties.title)
+		   //     		.style("left", (d3.event.pageX) + "px")		
+	    //             .style("top", (d3.event.pageY) + "px");
+	    //    		}
+	    //    	}
+    	// })
+     //    .on("mouseout", function(d){
+     //    	label.style("opacity", 0);	
+     //    })
        ;
 }
 
 function rotateTo(place){
-	var loc = d3.select("#" + place)
-	console.log(loc)
+	console.log("rotating to " + place);
+
+	var loc = d3.select("#" + place);
+	
 	var p = d3.geoPath().centroid(loc.datum())
 	    d3.transition()
 	        .duration(2000)
