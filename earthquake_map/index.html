@@ -1,111 +1,156 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+
 <head>
-	<title>eq_map</title>
-	<link rel="stylesheet" href="style.css">
-	<script src="js/lib/jquery-3.1.1.min.js"></script>
-	<script src="js/lib/d3.min.js"></script>
-	<script src="js/lib/handlebars-v4.0.5.js"></script>
-	<script src="js/lib/topojson.min.js"></script>
+    <!--links to Cesium CDN, Font Awesome-->
+    <title>AMNH Earthquake Explorer</title>
+    <!-- <link rel="stylesheet" href="stylesheet.css"> -->
+    <link rel="stylesheet" href="https://cesiumjs.org/releases/1.11/Build/Cesium/Widgets/widgets.css">
+    <meta name=description value="AMNH Earthquake Explorer">
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+    <!-- <div class="overlay">
+        <h2>Welcome to the Shake Finder!<i class="fa fa-globe" aria-hidden="true"></i></h2>
+        <p>Choose a date range, select a magnitude, and see where in the world it's shakin! Click a data point to learn more about the quake, including date/time, location and magnitude.
+        </p>
+        <p class="note">Note: Searches greater than 30 days may return large amounts of data and take awhile to display. Please be patient while rendering data.</p>
+        <div class="shake">
+            <form class="searchbox" id="shake_search">
+                <p>Start date:</p>
+                <input class="date" id="date_timepicker_start" type="text">
+                <p>End date:</p>
+                <input class="date" id="date_timepicker_end" type="text">
+                <p>Magnitude:</p>
+                <select class="date" id="magnitude" name="magnitude" form="shake_search">
+                    <option value="1">1 or less</option>
+                    <option value="2">Magnitude 2 +</option>
+                    <option value="3">Magnitude 3 +</option>
+                    <option value="4">Magnitude 4 +</option>
+                    <option value="5">Magnitude 5 +</option>
+                    <option value="6">Magnitude 6 +</option>
+                    <option value="7">7 or More</option>
+                </select>
 
-	<!-- GLOBE -->
-	<div id="globe"> </div>
+                <p>
+                    <input type="submit" value="Get Shakin'">
+                </p>
+                <p>
+                    <input type="button" id="reset" value="Reset Search">
+                </p>
+            </form>
+            <hr>
+            <p class="note">Data and visualization by Cesium/USGS.</p>
+        </div>
+    </div> -->
+    
+    <!-- GLOBE -->
+    <div id="cesiumContainer"></div>
 
-	<!-- LEFT SIDEBAR -->
-	<div id="left_sidebar" class="sidebar">
-		<h1> Earthquake Explorer </h1>
+    <!-- LEFT SIDEBAR -->
+    <div id="left_sidebar" class="sidebar">
+        <h1> Earthquake Explorer </h1>
 
-		<div class="section">
-			<h2> Search the Data </h2>
-			<hr align="center" width="80%">
+        <div class="section">
+            <h2> Search the Data </h2>
+            <hr align="center" width="80%">
 
-			<div id="filters">
-				<label for="nTime"> Explore by time of earthquake </label>
-			  	<input type="range" min="1" max="5" id="nTime">
-			  	<br>
-			  	<label for="nSize"> Explore by earthquake magnitude </label>
-			  	<input type="range" min="0" max="6" id="nSize"><br><br>
-			</div>
-		</div>
+            <div id="filters">
+                <label for="nTime"> Explore by time of earthquake </label>
+                <input type="range" min="1" max="5" id="nTime">
+                <br>
+                <label for="nSize"> Explore by earthquake magnitude </label>
+                <input type="range" min="0" max="6" id="nSize"><br><br>
+            </div>
+        </div>
 
-		<div class="section">
-			<h2> Question Your Knowledge </h2>
-			<hr align="center" width="80%">
-			<div id="question_container"> </div>
+        <div class="section">
+            <h2> Question Your Knowledge </h2>
+            <hr align="center" width="80%">
+            <div id="question_container"> </div>
 
-		</div>
+        </div>
 
-		<div class="section">
-			<h2> Know Your Definitions </h2>
-			<hr align="center" width="80%">
-			<div id="definition_container"> </div>
-		</div>
-	
-	</div>
-	
-	<!-- RIGHT SIDEBAR -->
-	<div id="right_sidebar" class="sidebar">
-		<div class="section">
-			<h2> Recent Earthquake Teachable Moments from IRIS </h2>
-			<hr align="center" width="80%">
-			<div id="retm_container"> </div>
-		</div>
-		<div class="section">
-			<h2> US Array of Seismic Stations </h2>
-			<hr align="center" width="80%">
-			<p> This is some info about the US array. What do earthquake waves look like as they travel through the earth? </p>
-			<p> Watch this video of the US Array of seismometers to find out. </p>
-			<div id="usarray">Watch Now</div>
-		</div>
-		<div class="section">
-			<h2> Earthquakes in the News </h2>
-			<hr align="center" width="80%">
-			<div id="news_container"> </div>
-		</div>
-	</div>
+        <div class="section">
+            <h2> Know Your Definitions </h2>
+            <hr align="center" width="80%">
+            <div id="definition_container"> </div>
+        </div>
 
+<!--         <div id="credit-container">
+        </div> -->
+    
+    </div>
+    
+    <!-- RIGHT SIDEBAR -->
+    <div id="right_sidebar" class="sidebar">
+        <div class="section">
+            <h2> Recent Earthquake Teachable Moments from IRIS </h2>
+            <hr align="center" width="80%">
+            <div id="retm_container"> </div>
+        </div>
+        <div class="section">
+            <h2> US Array of Seismic Stations </h2>
+            <hr align="center" width="80%">
+            <p> This is some info about the US array. What do earthquake waves look like as they travel through the earth? </p>
+            <p> Watch this video of the US Array of seismometers to find out. </p>
+            <div id="usarray">Watch Now</div>
+        </div>
+        <div class="section">
+            <h2> Earthquakes in the News </h2>
+            <hr align="center" width="80%">
+            <div id="news_container"> </div>
+        </div>
+    </div>
 
-	<!-- TEMPLATES -->
-	<script id="question_template" type="text/x-handlebars-template">
-		{{#each questions}}
-			<div class="entry">
-				<img class="switch" src="" /> <h3> {{name}} </h3>
-				<!-- <img class="" src="" /> -->
-				<p> {{definition}} </p>
-			</div>
-		{{/each}}
-	</script>
+    <!-- TEMPLATES -->
+    <script id="question_template" type="text/x-handlebars-template">
+        {{#each questions}}
+            <div class="entry">
+                <img class="switch" src="" /> <h3> {{name}} </h3>
+                <!-- <img class="" src="" /> -->
+                <p> {{definition}} </p>
+            </div>
+        {{/each}}
+    </script>
     
     <script id="definition_template" type="text/x-handlebars-template">
-    	{{#each definitions}}
-    		<div class="entry">
-	    		<img class="switch" src="" /> <h3> {{term}} </h3>
-    			<p>	{{definition}} </p>
-    	{{/each}}
-	</script>
+        {{#each definitions}}
+            <div class="entry">
+                <img class="switch" src="" /> <h3> {{term}} </h3>
+                <p> {{definition}} </p>
+        {{/each}}
+    </script>
 
-	<script id="retm_template" type="text/x-handlebars-template">
-		{{#each retm}}
-			<div class="retm-region">
-			{{short_region}}
+    <script id="retm_template" type="text/x-handlebars-template">
+        {{#each retm}}
+            <div class="retm-region">
+            {{short_region}}
 
-			</div>
-		{{/each}}
-	</script>
+            </div>
+        {{/each}}
+    </script>
 
-	<script id="news_template" type="text/x-handlebars-template">
-		{{#each news}}
-			<div class="news" data-link="{{filepath}}">
-				<h3> {{title}} </h3>
-				<p> {{publication}} </p>
-			</div>
-		{{/each}}
-	</script>
-
-    <script src="js/lib/versor.js"></script>
-    <script src="js/globe.js"></script>
-    <script src="js/script.js"></script>
+    <script id="news_template" type="text/x-handlebars-template">
+        {{#each news}}
+            <div class="news" data-link="{{filepath}}">
+                <h3> {{title}} </h3>
+                <p> {{publication}} </p>
+            </div>
+        {{/each}}
+    </script>
 </body>
+
+<script src="js/lib/jquery-3.1.1.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.4/build/jquery.datetimepicker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.4/build/jquery.datetimepicker.full.min.js"></script>
+<script src="js/lib/d3.min.js"></script>
+<script src="js/lib/handlebars-v4.0.5.js"></script>
+<script src="js/lib/topojson.min.js"></script>
+<script src="https://cesiumjs.org/releases/1.11/Build/Cesium/Cesium.js "></script>
+<script type="text/javascript" src="js/globe.js"></script>
+<script type="text/javascript" src="js/script.js"></script>
+
 </html>

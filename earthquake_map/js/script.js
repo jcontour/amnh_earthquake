@@ -1,15 +1,16 @@
+'use strict';
+
 var app = app || {};
 
 app.main = (function() {
 
+
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ queuing data calls
 	function callGlobeData(){
 		console.log("calling data for globe")
-
 		d3.queue(2)				// calling map data
-		.defer(d3.json, "data/countries-and-states.json")
 		.defer(d3.json, "data/tec_boundaries.json")
-		.defer(d3.json, "data/history_data.json")
+		.defer(d3.json, "data/history.json")
 		.defer(d3.json, "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson")
 		.awaitAll(function(error, results){
 			if (error) throw error;
@@ -19,20 +20,14 @@ app.main = (function() {
 
 	function drawGlobeData(data){
 		console.log("drawing globe")
-		var mapData = data[0];
-		
-		var states = topojson.feature(mapData, mapData.objects.states).features;
-	    drawMap('state map', states, true);
-	    
-	    var countries = topojson.feature(mapData, mapData.objects.countries).features;	    
-	    drawMap('country map', countries, true);
 
-		var tectonicPlates = data[1];
-	    drawMap('plates', tectonicPlates.features, false);
+		var tectonicPlates = data[0];
+	    // drawMap('plates', tectonicPlates.features, false);
 
 	    var earthquakes = [];
-	    // for (i = 0; i <data[2].features.length; i++){ earthquakes.push(data[2].features[i]) }		// UNCOMMENT FOR MAJOR LAG 
-	    for (i = 0; i <data[3].features.length; i++){ earthquakes.push(data[3].features[i]) };
+	    
+	    for (var i = 0; i <data[1].features.length; i++){ earthquakes.push(data[1].features[i]) }		// UNCOMMENT FOR MAJOR LAG 
+	    for (var i = 0; i <data[2].features.length; i++){ earthquakes.push(data[2].features[i]) };
 		earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
 		
 		drawData(earthquakes);
@@ -97,20 +92,15 @@ app.main = (function() {
 
 		for (var i = 0; i < data['retm'].length; i++) {
 			var name = data['retm'][i].short_region;
-            name = name.replace(/\s+/g, '');
-            name = name.toLowerCase()
 
-			var locOnGlobe = false;
-			for(var j = 0; j < placeNames.length; j++){
-				// if name matches and location is not already represented in retm
-				if (name == placeNames[j] && $.inArray(name, namelist) == -1) {	
-					// console.log(name)
-					locOnGlobe = true;
-					filteredData.push(data['retm'][i])
-					namelist.push(name)
-					break;
-				}
-			}		
+			//	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<<<<<<<< PUT SOMETHING HERE TO FIND LAT/LON of NAME
+			if ($.inArray(name, namelist) == -1) {	
+				// console.log(name)
+				filteredData.push(data['retm'][i])
+				namelist.push(name)
+				// break;
+			}
+					
 		}
 
 		// console.log(filteredData);
@@ -122,10 +112,10 @@ app.main = (function() {
 
 
 	var attachEvents = function(){
-		var drag = d3.drag()								// rotate on drag
-		    .on("start", dragstarted)
-		    .on("drag", dragged)
-		svg.call(drag);
+		// var drag = d3.drag()								// rotate on drag
+		//     .on("start", dragstarted)
+		//     .on("drag", dragged)
+		// svg.call(drag);
 
 		// var zoom = d3.zoom()
 		// 	.on("zoom",function() {

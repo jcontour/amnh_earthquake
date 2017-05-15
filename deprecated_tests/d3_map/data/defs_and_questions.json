@@ -1,0 +1,63 @@
+{ "definitions": [  
+      {  
+         "term" : "Epicenter",
+         "definition" : "definition of epicenter"
+      },
+      {  
+         "term" : "Magnitude",
+         "definition" : "definition of magnitude"
+      },
+      {  
+         "term" : "Seismograph",
+         "definition" : "definition of seismograph"
+      },
+      {  
+         "term" : "Tectonic Plate",
+         "definition" : "definition of tectonic plate"
+      }
+   ],
+   "questions": [
+      {  
+         "name":"The Ring of Fire",
+         "coordinates":[22.543034, 144.429486],
+         "definition":"question about ring of fire"
+      },
+      {  
+         "name":"Central US",
+         "coordinates":[36.182210, -94.153267],
+         "definition":"question about central us "
+      },
+      {  
+         "name":"Mid-Atlantic Ridge",
+         "coordinates":[23.728751, -44.555315],
+         "definition":"question about mid-atlantic ridge"
+      },
+      {  
+         "name":"The Himalayan Mountains",
+         "coordinates":[29.626487, 82.041529],
+         "definition":"question about himalayas"
+      }
+   ],
+   "news": [
+      {
+         "title":"Destruction and Tsunami After Plates Collide Again, 2017",
+         "publication": "New York Times",
+         "filepath":"data/news/peru_2017.pdf"
+      },
+      {
+         "title":"A Look at Nepal's Progress in Earthquake Recovery, 2017",
+         "publication": "New York Times",
+         "filepath":"data/news/nepal_2017.pdf"
+      },
+      {
+         "title":"Earthquake Shakes Southern Greece, 2008",
+         "publication": "New York Times",
+         "filepath":"data/news/greece_2008.pdf"
+      },
+      {
+         "title":"Earthquake in Turkey, 1999",
+         "publication": "New York Times",
+         "filepath":"data/news/turkey_1999.pdf"
+      }
+   ]
+}

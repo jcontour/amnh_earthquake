@@ -1,0 +1,68 @@
+body {
+  padding: 0px;
+  margin: 0px;
+  background-color: #000E1D;
+  font-family: sans-serif;
+  color: white;
+}
+
+#globe { width: 100%; }
+
+svg { width: 100% }
+
+path { fill: none; }
+
+.ocean {
+  fill: #003E51;
+  stroke-width: .8px;
+}
+
+.latlon {
+    stroke: #10566D;
+    stroke-width: .5px;
+    stroke-dasharray: 5;
+}
+
+.land {
+    fill: #799A3D;
+    stroke-width: .8px;
+    stroke: #ACC37E;
+}
+
+text{
+  color: white;
+  font-size: 5pt;
+}
+
+.plates .land{
+    fill: none;
+    stroke-width: 1px;
+    stroke: black;
+}
+
+/*label {
+  color: white;
+}*/
+
+/*div.label { 
+    color: white;  
+    padding: 2px;       
+    font: 12px sans-serif;    
+    border: 0px;    
+    border-radius: 8px;     
+    pointer-events: none;     
+}*/
+
+@keyframes new-eq-pulse {
+    0% {stroke-width: 0;}
+    50% {stroke-width: 3;}
+    100% {stroke-width: 0;}
+}
+
+circle { position: relative; }
+
+.new-eq {
+  stroke: white;
+  animation: new-eq-pulse 2s linear infinite;
+}
+
