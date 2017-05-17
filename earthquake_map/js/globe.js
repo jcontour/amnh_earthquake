@@ -57,10 +57,9 @@ var setupGlobe = function(){
         sceneModePicker: false,
         fullscreenButton: false,
         navigationHelpButton: false
-        // skyBox : new Cesium.SkyBox({
-        //     skyBox.show = false
-        // })
     });
+
+    // viewer.scene.globe.enableLighting = true;
 }
 
 var drawData = function(earthquakes){
@@ -84,3 +83,11 @@ var drawData = function(earthquakes){
         });
     }
 }
+
+var rotateTo = function(lat, lon){
+    viewer.camera.flyTo({
+        destination : Cesium.Cartesian3.fromDegrees(lon, lat, viewer.camera.positionCartographic.height)
+    });
+}
+
+

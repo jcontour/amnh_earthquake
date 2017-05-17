@@ -30,7 +30,7 @@ app.main = (function() {
 	    for (var i = 0; i <data[2].features.length; i++){ earthquakes.push(data[2].features[i]) };
 		earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
 		
-		drawData(earthquakes);
+		// drawData(earthquakes);
 
 		initTemplates();
 	}
@@ -76,7 +76,6 @@ app.main = (function() {
 					showTemplate("#retm_container", retm_template, filtered); 
 				})
 			})
-
 	}
 
 	function showTemplate(div, template, data){
@@ -84,73 +83,70 @@ app.main = (function() {
 		$(div).html(template(data));
 	}
 
-	// checking to see if retm location matches a location on the globe
-	// placeNames is an array populated in the drawMap function in globe.js
-	function filterRETM(data, callback) {	
+	// var findLatLon = function(loc){
+	// 	var coordinates
+
+	// 	d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", function(err, res){
+	// 		// console.log(res)
+	// 		return res['results'][0]['geometry']['location']
+	// 	})
+	// }
+
+	var findLatLon = function(loc, callback){
+	    var coordinates
+
+	    d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", function(err, res){
+	        console.log(loc, res['results'][0]['geometry']['location']['lat'], res['results'][0]['geometry']['location']['lng'] )
+	        callback({lat: res['results'][0]['geometry']['location']['lat'], lon: res['results'][0]['geometry']['location']['lng'] })
+	        // callback(null)
+	    })
+	}
+
+
+	function filterRETM(data, callback) {
+		console.log("filtering retm")	
 		var filteredData = [];
 		var namelist = [];
 
 		for (var i = 0; i < data['retm'].length; i++) {
 			var name = data['retm'][i].short_region;
 
-			//	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<<<<<<<< PUT SOMETHING HERE TO FIND LAT/LON of NAME
 			if ($.inArray(name, namelist) == -1) {	
-				// console.log(name)
 				filteredData.push(data['retm'][i])
 				namelist.push(name)
-				// break;
 			}
-					
 		}
 
-		// console.log(filteredData);
-		callback( {"retm" : filteredData} );
+		var q = d3.queue();
+
+		for (var i = 0; i < 10; i++){
+		  q.defer(findLatLon, filteredData[i].short_region);
+		}
+
+		q.awaitAll(function(err, res) {
+		  // if (err) throw err;
+		  console.log("retm queue done", res);
+		});
+
+		// for (var i = 0; i < filteredData.length; i++){
+		// 	var loc = findLatLon(filteredData[i].short_region)
+		// 	console.log(filteredData[i].short_region + " " + loc)
+		// 	filteredData[i].location = loc
+		// }
+
+		// callback(filteredData)
 	}
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION
 
-
 	var attachEvents = function(){
-		// var drag = d3.drag()								// rotate on drag
-		//     .on("start", dragstarted)
-		//     .on("drag", dragged)
-		// svg.call(drag);
 
-		// var zoom = d3.zoom()
-		// 	.on("zoom",function() {
-		//     	g.attr("transform", d3.event.transform)
-		//         g.selectAll("path")  
-		//             .attr("d", path.projection(projection)); 
-		//         g.selectAll("circle")
-		//             .attr("d", path.projection(projection));
-		//         })
-		// 	.scaleExtent([1,10])
+		
 
-
-		// // console.log(zoom.scale())
-		    
-		// svg.call(zoom)
-
-
-		// d3.select("#nTime").on("input", function() {		// time filter
-		// 	setOpacity();
-		// })
-
-		// d3.select("#nSize").on("input", function() {		// time filter
-		// 	setOpacity();
-		// })
-
-		// $('#test1').on("click", function(){
-		// 	rotateTo("brazil");
-		// })
-		// $('#test2').on("click", function(){
-		// 	rotateTo("papuanewguinea");
-		// })
-		// $('#test3').on("click", function(){
-		// 	rotateTo("saudiarabia");
-		// })
 	}
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 
 
 	var init = function(){
 		console.log('Initializing app.');
