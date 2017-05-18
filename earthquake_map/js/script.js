@@ -74,6 +74,7 @@ app.main = (function() {
 
 				filterRETM(results[1], function(filtered){
 					showTemplate("#retm_container", retm_template, filtered); 
+					attachEvents();
 				})
 			})
 	}
@@ -83,25 +84,16 @@ app.main = (function() {
 		$(div).html(template(data));
 	}
 
-	// var findLatLon = function(loc){
-	// 	var coordinates
-
-	// 	d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", function(err, res){
-	// 		// console.log(res)
-	// 		return res['results'][0]['geometry']['location']
-	// 	})
-	// }
-
 	var findLatLon = function(loc, callback){
 	    var coordinates
 
 	    d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", function(err, res){
-	        console.log(loc, res['results'][0]['geometry']['location']['lat'], res['results'][0]['geometry']['location']['lng'] )
-	        callback({lat: res['results'][0]['geometry']['location']['lat'], lon: res['results'][0]['geometry']['location']['lng'] })
-	        // callback(null)
+	        // console.log(loc, res['results'][0]['geometry']['location']['lat'], res['results'][0]['geometry']['location']['lng'] )
+	        callback(err, {lat: res['results'][0]['geometry']['location']['lat'], lon: res['results'][0]['geometry']['location']['lng'] })
 	    })
 	}
 
+	var retm_data = [];
 
 	function filterRETM(data, callback) {
 		console.log("filtering retm")	
@@ -117,32 +109,35 @@ app.main = (function() {
 			}
 		}
 
-		var q = d3.queue();
+		var q = d3.queue(1);
 
-		for (var i = 0; i < 10; i++){
+		for (var i = 0; i < filteredData.length; i++){
 		  q.defer(findLatLon, filteredData[i].short_region);
 		}
 
 		q.awaitAll(function(err, res) {
-		  // if (err) throw err;
-		  console.log("retm queue done", res);
+			if (err) throw err;
+			console.log("retm queue done");
+			for (var i = 0; i < filteredData.length; i++){
+				filteredData[i].location = res[i]
+			}
+
+			retm_data = filteredData
+			callback({'retm': filteredData.slice(0,10)})
 		});
-
-		// for (var i = 0; i < filteredData.length; i++){
-		// 	var loc = findLatLon(filteredData[i].short_region)
-		// 	console.log(filteredData[i].short_region + " " + loc)
-		// 	filteredData[i].location = loc
-		// }
-
-		// callback(filteredData)
 	}
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION
 
 	var attachEvents = function(){
+		console.log("attaching events")
 
-		
+		$('.locate').click( function(){
+			var num = $(this).attr("data-id")
+			console.log("locate ", retm_data[num].short_region)
+			rotateTo(retm_data[num].location.lat, retm_data[num].location.lon)
+		})
 
 	}
 

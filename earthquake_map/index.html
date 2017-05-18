@@ -22,7 +22,7 @@
 
         <div class="section">
             <h2> Search the Data </h2>
-            <hr align="center" width="80%">
+            <hr align="center" width="98%">
 
             <div id="filters">
                 <label for="nTime"> Explore by time of earthquake </label>
@@ -35,14 +35,14 @@
 
         <div class="section">
             <h2> Question Your Knowledge </h2>
-            <hr align="center" width="80%">
+            <hr align="center" width="98%">
             <div id="question_container"> </div>
 
         </div>
 
         <div class="section">
             <h2> Know Your Definitions </h2>
-            <hr align="center" width="80%">
+            <hr align="center" width="98%">
             <div id="definition_container"> </div>
         </div>    
     </div>
@@ -51,19 +51,19 @@
     <div id="right_sidebar" class="sidebar">
         <div class="section">
             <h2> Recent Earthquake Teachable Moments from IRIS </h2>
-            <hr align="center" width="80%">
+            <hr align="center" width="98%">
             <div id="retm_container"> </div>
         </div>
         <div class="section">
             <h2> US Array of Seismic Stations </h2>
-            <hr align="center" width="80%">
+            <hr align="center" width="98%">
             <p> This is some info about the US array. What do earthquake waves look like as they travel through the earth? </p>
             <p> Watch this video of the US Array of seismometers to find out. </p>
             <div id="usarray">Watch Now</div>
         </div>
         <div class="section">
             <h2> Earthquakes in the News </h2>
-            <hr align="center" width="80%">
+            <hr align="center" width="98%">
             <div id="news_container"> </div>
         </div>
     </div>
@@ -72,8 +72,7 @@
     <script id="question_template" type="text/x-handlebars-template">
         {{#each questions}}
             <div class="entry">
-                <img class="switch" src="" /> <h3> {{name}} </h3>
-                <!-- <img class="" src="" /> -->
+                <img class="switch" src="" /> <h3> {{name}} </h3>                   <!--WORKING ON THIS INTERACTION WITH THE SWITCH -->
                 <p> {{definition}} </p>
             </div>
         {{/each}}
@@ -82,16 +81,18 @@
     <script id="definition_template" type="text/x-handlebars-template">
         {{#each definitions}}
             <div class="entry">
-                <img class="switch" src="" /> <h3> {{term}} </h3>
+                <img class="switch" src="" /> <h3> {{term}} </h3>                   <!--WORKING ON THIS INTERACTION WITH THE SWITCH -->
                 <p> {{definition}} </p>
         {{/each}}
     </script>
 
     <script id="retm_template" type="text/x-handlebars-template">
         {{#each retm}}
-            <div class="retm-region">
-            {{short_region}}
-
+            <div class="retm_wrapper">
+                <div class="retm_region">
+                    {{short_region}}
+                </div>
+                <div class="locate" data-id="{{@index}}"> locate </div>
             </div>
         {{/each}}
     </script>
