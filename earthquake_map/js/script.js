@@ -139,6 +139,15 @@ app.main = (function() {
 			rotateTo(retm_data[num].location.lat, retm_data[num].location.lon)
 		})
 
+		$('.arrow').click(function(){
+			if ($(this).hasClass("up")) {
+				console.log("opening")
+				$(this).removeClass("up").addClass("down").siblings('p').slideDown();
+			} else {
+				$(this).removeClass("down").addClass("up").siblings('p').slideUp();
+			}
+		})
+
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 

@@ -29,7 +29,7 @@
                 <input type="range" min="1" max="5" id="nTime">
                 <br>
                 <label for="nSize"> Explore by earthquake magnitude </label>
-                <input type="range" min="0" max="6" id="nSize"><br><br>
+                <input type="range" min="0" max="6" id="nSize">
             </div>
         </div>
 
@@ -72,8 +72,8 @@
     <script id="question_template" type="text/x-handlebars-template">
         {{#each questions}}
             <div class="entry">
-                <img class="switch" src="" /> <h3> {{name}} </h3>                   <!--WORKING ON THIS INTERACTION WITH THE SWITCH -->
-                <p> {{definition}} </p>
+                <i class="arrow up"></i> <h3> {{name}} </h3>
+                <p class="definition"> {{definition}} </p>
             </div>
         {{/each}}
     </script>
@@ -81,17 +81,16 @@
     <script id="definition_template" type="text/x-handlebars-template">
         {{#each definitions}}
             <div class="entry">
-                <img class="switch" src="" /> <h3> {{term}} </h3>                   <!--WORKING ON THIS INTERACTION WITH THE SWITCH -->
-                <p> {{definition}} </p>
+                <i class="arrow up"></i> <h3> {{term}} </h3>
+                <p class="definition"> {{definition}} </p>
+            </div>
         {{/each}}
     </script>
 
     <script id="retm_template" type="text/x-handlebars-template">
         {{#each retm}}
             <div class="retm_wrapper">
-                <div class="retm_region">
-                    {{short_region}}
-                </div>
+                <div class="retm_region"> {{short_region}} </div>
                 <div class="locate" data-id="{{@index}}"> locate </div>
             </div>
         {{/each}}

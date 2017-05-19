@@ -28,8 +28,12 @@ text{
 .section {
 	border: 2px solid white;
 	background-color: rgba(0,0,0, 0.5);
-	padding: 20px;
+	padding: 20px 20px 15px 20px;
 	margin: 5px 0px;
+}
+
+.entry {
+	margin-bottom: 5px;
 }
 
 h2{
@@ -40,6 +44,7 @@ h2{
 h3{
 	font-size: .9em;
 	margin: 0;
+	display: inline-block;
 }
 
 p{
@@ -49,9 +54,11 @@ p{
 hr{
 	margin-top: 5px;
 	margin-bottom: 15px;
+	border-width: 1px;
+	border-style: solid;
 }
 
-/*			RETM STYLING			*/
+/* ------------ RETM STYLING ------------ */
 
 .retm_wrapper {
 	display: block;
@@ -78,4 +85,31 @@ hr{
 	color: white;
 	border: 2px solid white;
 	padding: 1px 3px;
+}
+
+/* ------------ ARROW STYLING ------------ */
+
+i {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 4px;
+    margin-right: 10px;
+    position: relative;
+}
+
+.up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    top: 3px;
+}
+
+.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    top: -3px;
+}
+
+.definition {
+	display: none;
 }
