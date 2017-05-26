@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!--links to Cesium CDN, Font Awesome-->
+    <title>AMNH Earthquake Explorer</title>
+    <!-- <link rel="stylesheet" href="stylesheet.css"> -->
+    <link rel="stylesheet" href="https://cesiumjs.org/releases/1.11/Build/Cesium/Widgets/widgets.css">
+    <meta name=description value="AMNH Earthquake Explorer">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    
+    <!-- GLOBE -->
+    <div id="cesiumContainer"></div>
+
+    <!-- LEFT SIDEBAR -->
+    <div id="left_sidebar" class="sidebar">
+        <h1> Earthquake Explorer </h1>
+
+        <div class="section">
+            <h2> Search the Data </h2>
+            <hr align="center" width="98%">
+
+            <div id="filters">
+                <label for="nTime"> Explore by time of earthquake </label>
+                <input type="range" min="1" max="5" id="nTime">
+                <br>
+                <label for="nSize"> Explore by earthquake magnitude </label>
+                <input type="range" min="0" max="6" id="nSize">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2> Question Your Knowledge </h2>
+            <hr align="center" width="98%">
+            <div id="question_container"> </div>
+
+        </div>
+
+        <div class="section">
+            <h2> Know Your Definitions </h2>
+            <hr align="center" width="98%">
+            <div id="definition_container"> </div>
+        </div>    
+    </div>
+    
+    <!-- RIGHT SIDEBAR -->
+    <div id="right_sidebar" class="sidebar">
+        <div class="section">
+            <h2> Recent Earthquake Teachable Moments from IRIS </h2>
+            <hr align="center" width="98%">
+            <div id="retm_container"> </div>
+        </div>
+        <div class="section">
+            <h2> US Array of Seismic Stations </h2>
+            <hr align="center" width="98%">
+            <p> This is some info about the US array. What do earthquake waves look like as they travel through the earth? </p>
+            <p> Watch this video of the US Array of seismometers to find out. </p>
+            <div id="usarray">Watch Now</div>
+        </div>
+        <div class="section">
+            <h2> Earthquakes in the News </h2>
+            <hr align="center" width="98%">
+            <div id="news_container"> </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <script id="question_template" type="text/x-handlebars-template">
+        {{#each questions}}
+            <div class="entry">
+                <i class="arrow up"></i> <h3> {{name}} </h3>
+                <p class="definition"> {{definition}} </p>
+            </div>
+        {{/each}}
+    </script>
+    
+    <script id="definition_template" type="text/x-handlebars-template">
+        {{#each definitions}}
+            <div class="entry">
+                <i class="arrow up"></i> <h3> {{term}} </h3>
+                <p class="definition"> {{definition}} </p>
+            </div>
+        {{/each}}
+    </script>
+
+    <script id="retm_template" type="text/x-handlebars-template">
+        {{#each retm}}
+            <div class="retm_wrapper">
+                <div class="retm_region"> {{short_region}} </div>
+                <div class="locate" data-id="{{@index}}"> locate </div>
+            </div>
+        {{/each}}
+    </script>
+
+    <script id="news_template" type="text/x-handlebars-template">
+        {{#each news}}
+            <div class="news" data-link="{{filepath}}">
+                <h3> {{title}} </h3>
+                <p> {{publication}} </p>
+            </div>
+        {{/each}}
+    </script>
+</body>
+
+<script src="js/lib/jquery-3.1.1.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.4/build/jquery.datetimepicker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.4/build/jquery.datetimepicker.full.min.js"></script>
+<script src="js/lib/d3.min.js"></script>
+<script src="js/lib/handlebars-v4.0.5.js"></script>
+<script src="js/lib/topojson.min.js"></script>
+<script src="https://cesiumjs.org/releases/1.11/Build/Cesium/Cesium.js "></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="js/globe.js"></script>
+<script type="text/javascript" src="js/script.js"></script>
+
+</html>
