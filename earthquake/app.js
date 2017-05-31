@@ -32,22 +32,20 @@ server.listen(PORT, function(){
 })
 
 /*------------------------------ JOHNNY-FIVE SETUP ------------------------------*/
- 
-var board = new five.Board();
-var led = null;
 
-board.on("ready", function() {
-  led = new five.Led(13);
-});
+var isConnected = false
+var board = new five.Board()
 
-var ledon = function(bool){
-	console.log(bool)
-	if (bool){
-		led.stop()
-	} else {
-		led.blink()
-	}
-}
+board.on('ready', function () {
+  isConnected = true
+  console.log("board connected!")
+})
+
+setTimeout(function () {
+  if (!isConnected) {
+    console.log("no board connected")
+  }
+}, 5000)
 
 /*----------------------------- APP -----------------------------*/
 
@@ -60,10 +58,10 @@ io.on('connection', function(socket){
     // 2 - message(data)
 
     //socket refers to one user
-    socket.emit('welcome', 'Welcome! Your id is ' + socket.id);
+    // socket.emit('welcome', 'Welcome! Your id is ' + socket.id);
 
     //io.sockets is everyone
-    io.sockets.emit('hey-everybody', 'hey everybody please welcome ' + socket.id);
+    // io.sockets.emit('hey-everybody', 'hey everybody please welcome ' + socket.id);
 
     //listeners
     socket.on('led-on', function(data){
