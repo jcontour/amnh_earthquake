@@ -64,10 +64,10 @@ io.on('connection', function(socket){
     // io.sockets.emit('hey-everybody', 'hey everybody please welcome ' + socket.id);
 
     //listeners
-    socket.on('led-on', function(data){
-        console.log("button pressed")
-        ledon(data);
-    })
+    // socket.on('led-on', function(data){
+    //     // console.log("button pressed")
+    //     // ledon(data);
+    // })
 
     socket.on('disconnect', function(data){
     	console.log("")

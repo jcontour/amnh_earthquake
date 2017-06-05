@@ -30,7 +30,7 @@ app.main = (function() {
 	    for (var i = 0; i <data[2].features.length; i++){ earthquakes.push(data[2].features[i]) };
 		earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
 		
-		// drawData(earthquakes);
+		drawData(earthquakes);
 
 		initTemplates();
 	}
@@ -154,21 +154,33 @@ app.main = (function() {
 			if ($(this).hasClass("up")) {
 				console.log("opening")
 				$(this).removeClass("up").addClass("down").siblings('p').slideDown();
-				socket.emit('led-on', true);
 			} else {
 				$(this).removeClass("down").addClass("up").siblings('p').slideUp();
-				socket.emit('led-on', false);
 			}
+		})
+
+		d3.select("#nTime").on("input", function() {		// time filter
+			filterData(this.value, "time");
+		})
+
+		d3.select("#nSize").on("input", function() {		// time filter
+			filterData(this.value, "size");
 		})
 
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 
 
+	var setup = function(){
+		document.getElementById("nTime").value = "0";
+		document.getElementById("nSize").value = "0";
+	}
+
 
 
 	var init = function(){
 		console.log('Initializing app.');
+		setup();
 		socketSetup();
 		setupGlobe();
 		callGlobeData();
