@@ -1,9 +1,9 @@
-/*---------- BASIC SETUP ----------*/
-var express = require('express'),		// helper for setting up web framework
+/*---------------------------------------- NODE SETUP ----------------------------------------*/
+var express = require('express'),
 	socket = require("socket.io"), 
 	five = require("johnny-five");
 	
-var app = express();						// our Express app
+var app = express();
 var PORT = 4000;
 
 // Express server
@@ -22,7 +22,7 @@ app.use(function(req, res, next) {
 //will look inside this folder for front end of site
 app.use('/', express.static(__dirname + '/public'));
 
-/*------------------------------ SOCKET.IO SETUP ------------------------------*/
+/*----------------------------------------  SETUP ----------------------------------------*/
 
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
@@ -31,52 +31,71 @@ server.listen(PORT, function(){
     console.log('Express server is running at ' + PORT); 
 })
 
-/*------------------------------ JOHNNY-FIVE SETUP ------------------------------*/
+function remap_vals(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
 
 var isConnected = false
 var board = new five.Board()
+var time_pot_val = 0;
+var size_pot_val = 0; 
+var curr_time_val, curr_size_val;
 
-board.on('ready', function () {
-  isConnected = true
-  console.log("board connected!")
+/*----------------------------------------  SOCKET.IO APP ----------------------------------------*/
+
+board.on('ready', function () {         // ------------------------------ JOHNNY-FIVE SETUP
+    isConnected = true
+    console.log("board connected!")
+
+    size_pot = new five.Sensor({
+        pin: "A0",
+        freq: 250
+    });
+
+    time_pot = new five.Sensor({
+        pin: "A1",
+        freq: 250
+    });
+
+    board.repl.inject({
+        pot: size_pot, 
+        pot: time_pot
+    });
 })
 
-setTimeout(function () {
-  if (!isConnected) {
-    console.log("no board connected")
-  }
-}, 5000)
-
-/*----------------------------- APP -----------------------------*/
-
 io.on('connection', function(socket){
-    console.log("new connection!");
+    console.log("socket connection!");
 
+    if (!isConnected) {
+        console.log("no board connected")
+        socket.emit("knob", false)
+    } else {
+        socket.emit("knob", true)
+        time_pot.on("data", function() {
+            curr_time_val = Math.floor(remap_vals(this.value, 0, 1023, 1, 6))
+            if (time_pot_val !== curr_time_val){
+                time_pot_val = curr_time_val;
+                console.log( {time: time_pot_val, size: size_pot_val} )
+                socket.emit('filter', {time: time_pot_val, size: size_pot_val})
+            }
+        });
 
-    //key value pair
-    // 1 - a string that identifies the message
-    // 2 - message(data)
+        size_pot.on("data", function() {
+            curr_size_val = Math.floor(remap_vals(this.value, 0, 1023, 1, 6))
+            if (size_pot_val !== curr_size_val){
+                size_pot_val = curr_size_val;
+                console.log( {time: time_pot_val, size: size_pot_val} )
+                socket.emit('filter', {time: time_pot_val, size: size_pot_val})
+            }
+        });
+    }
 
-    //socket refers to one user
-    // socket.emit('welcome', 'Welcome! Your id is ' + socket.id);
-
-    //io.sockets is everyone
-    // io.sockets.emit('hey-everybody', 'hey everybody please welcome ' + socket.id);
-
-    //listeners
-    // socket.on('led-on', function(data){
-    //     // console.log("button pressed")
-    //     // ledon(data);
-    // })
-
+    // LISTENERS
     socket.on('disconnect', function(data){
-    	console.log("")
-        // io.sockets.emit('msg-to-clients', {
-        //     id: socket.id,
-        //     msg: socket.id + ' has just disconnected'
-        // })
+        console.log("disconnected")
     });
 
 })
 
-/* ------------------------------------------------------------------ */
+
+/* ---------------------------------------------------- ***END*** ---------------------------------------------------- */

@@ -134,9 +134,18 @@ app.main = (function() {
 	var socketSetup = function(){
 		socket = io.connect();
 		
-		socket.on('welcome', function(data){
-			console.log(data)
-		});
+		socket.on('knob', function(arduino){
+			console.log("arduino connected: ", arduino);
+			if (arduino) {
+				$('#filter_container').hide();				
+			} else {
+				setupFilters();
+			}
+		})
+
+		socket.on('filter', function(data){
+			filterData(data.time, data.size);
+		})
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION
@@ -160,18 +169,21 @@ app.main = (function() {
 		})
 
 		d3.select("#nTime").on("input", function() {		// time filter
-			filterData(this.value, "time");
+			var timeval = this.value;
+			var sizeval = document.getElementById("nSize").value;
+			filterData(timeval, sizeval);
 		})
 
 		d3.select("#nSize").on("input", function() {		// time filter
-			filterData(this.value, "size");
+			var timeval = document.getElementById("nTime").value;
+			var sizeval = this.value;
+			filterData(timeval, sizeval);
 		})
-
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 
 
-	var setup = function(){
+	var setupFilters = function(){
 		document.getElementById("nTime").value = "0";
 		document.getElementById("nSize").value = "0";
 	}
@@ -180,7 +192,6 @@ app.main = (function() {
 
 	var init = function(){
 		console.log('Initializing app.');
-		setup();
 		socketSetup();
 		setupGlobe();
 		callGlobeData();

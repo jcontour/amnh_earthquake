@@ -42,6 +42,7 @@ var eq_size = function(date, mag){
 }
 
 var setupGlobe = function(){
+    console.log("setting up globe")
     //new Cesium object, displays planet, generic zoom/display level
     viewer = new Cesium.Viewer('cesiumContainer', {
         imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
@@ -90,35 +91,25 @@ var drawData = function(earthquakes){
 }
 
 var rotateTo = function(lat, lon){
+    console.log("rotate to ", lat, lon)
+
     viewer.camera.flyTo({
         destination : Cesium.Cartesian3.fromDegrees(lon, lat, viewer.camera.positionCartographic.height)
     });
 }
 
-var filterData = function(value, type){
-    console.log(value, type)
-    if (type == "time"){
-        for (var i = 0; i < viewer.entities.values.length; i ++){
-        // for (var i = 0; i < 10; i ++){
-            var val = viewer.entities.values[i].description["_value"]
-            var vals = val.split(" ")
-            // console.log(vals)
-            if (vals[0] < value){
-                viewer.entities.values[i].show = false;
-            } else {
-                viewer.entities.values[i].show = true;
-            }
-        }
-    } else {
-        for (var i = 0; i < viewer.entities.values.length; i ++){
-            var val = viewer.entities.values[i].description["_value"]
-            var vals = val.split(" ")
-            // console.log(vals)
-            if (vals[1] < value){
-                viewer.entities.values[i].show = false;
-            } else {
-                viewer.entities.values[i].show = true;
-            }
+var filterData = function(timeval, sizeval){
+    console.log("filtering ", timeval, sizeval);
+
+    for (var i = 0; i < viewer.entities.values.length; i ++){
+        var val = viewer.entities.values[i].description["_value"]
+        var vals = val.split(" ")       // [time, size]
+        if (vals[0] == 0){
+            viewer.entities.values[i].show = true;
+        } else if (vals[0] < timeval || vals[1] < sizeval) {
+            viewer.entities.values[i].show = false;
+        } else {
+            viewer.entities.values[i].show = true;
         }
     }
 }
