@@ -3,8 +3,8 @@ var express = require('express'),
 	socket = require("socket.io"), 
 	five = require("johnny-five"),
     cors = require('cors'),
-    http = require('http'),
-    request = require('request');
+    request = require('request'),
+    fs = require('fs');
 	
 var app = express();
 var PORT = 4000;
@@ -109,12 +109,18 @@ io.on('connection', function(socket){
     socket.on('get-waveform', function(data, fn){
         
         request({
-            url: data.url
+            url: "http://service.iris.edu/fdsnws/event/1/query?format=text&eventid="+data.id+"&nodata=404"      //find the info about the earthquake
           }, function(error, response, body){
-            console.log('--------------------------------',body)
-            // res.send(body);
-            fn(body)
+            var list = body.split("|")
+            var time = list[13]   
+            var mag = list[22]                                                                              //get the start time data
+            console.log(time, mag)
+            var date = time.split("T")
+            var pngurl = "http://service.iris.edu/irisws/timeseries/1/query?output=plot&width=550&height=250&net=IU&sta=HNR&loc=00&cha=BHZ&starttime="+time+"&duration=1800"
+            request(pngurl).pipe(fs.createWriteStream("public/data/"+data.id+"_waveform.png"))                  //download the waveform image tot data folder
+            fn({time: date[0], mag: mag})
           })
+        
     })
 
     socket.on('get-url', function(data){

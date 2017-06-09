@@ -60,7 +60,7 @@ var setupGlobe = function(){
         infoBox: false,
         sceneModePicker: false,
         fullscreenButton: false,
-        // selectionIndicator : false,
+        selectionIndicator : false,
         navigationHelpButton: false
     });
 
@@ -131,6 +131,13 @@ var addRETMtoGlobe = function(data){
                 color : Cesium.Color.fromCssColorString('#A527FF'),
                 outlineWidth: 1
             },
+            billboard : {
+                image : "data/" + data[i]["iris_dmc_event_id"] + "_waveform.png",
+                scale : 0.8,
+                horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
+                verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+                show : false
+            },
             id : "retm" + i,
             name : "retm",
             description : data[i]["short_region"]
@@ -166,8 +173,10 @@ var highlightPoint = function(type, object, isHighlighted){
     } else {
         var id = object["id"]["_id"]
         if (isHighlighted){
+            object["id"]["_billboard"]["_show"]["_value"] = true;
             $('#'+id).addClass("highlighted")
         } else {
+            object["id"]["_billboard"]["_show"]["_value"] = false;
             $('#'+id).removeClass("highlighted")
         }
     }

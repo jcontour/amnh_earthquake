@@ -93,30 +93,23 @@ app.main = (function() {
 	    return $(selector, html).get(0) || $(html).filter(selector).get(0);
 	}
 
-	var findWaveForm = function(id){
-		var url = "http://ds.iris.edu/ds/nodes/dmc/tools/event/" + id
+	var findWaveForm = function(id, callback){
 		console.log("finding waveform")
 
-		socket.emit("get-waveform", {url: url, which: "waveform"}, function(res){
-			// $('#temp').html($(res).find('img.event-plot').attr("src")); 
-			console.log("waveform res")
-			console.log($(res).find('img.event-plot').attr("src"))					// CAN'T GET IMG LINK OUT OF HTML RESPONSE?!?!?!?!
-
+		$.ajax({								// check if picture exists before calling
+		    url:"data/"+id+"_waveform.png",
+		    type:'HEAD',
+		    error:
+		        function(){
+		            socket.emit("get-waveform", {id: id, which: "waveform"}, function(res){
+						callback(res);										// <<<<<<<<<<<<<<<<<<<< HOW DO I INSERT THIS INTO THE FILTERED RETM DATA ? ASYNC PROBLEMS
+					});
+		        },
+		    success:
+		        function(){
+		            console.log("picture!" + id)
+		        }
 		});
-
-			// var waveformhtml = $.parseHTML(res);
-
-			// var waveformhtml = $(waveformhtml).filter('.event-plot').attr("src")
-			// console.log(waveformhtml)
-
-
-			// var findimg = findInParsed(waveformhtml, 'event-plot')
-			// console.log(findimg)
-			// var src = $('#temp').children('img.event-plot').attr('src')
-			// console.log(src)
-			// $('#temp').empty()
-		// })
-
 	}
 
 	var retm_data = [];
@@ -153,7 +146,10 @@ app.main = (function() {
 			console.log("retm queue done");
 			for (var i = 0; i < filteredData.length; i++){
 				filteredData[i].location = res[i]
-				findWaveForm(filteredData[i]["iris_dmc_event_id"])
+				findWaveForm(filteredData[i]["iris_dmc_event_id"], function(info){
+					console.log(info)
+				})
+
 			}
 
 			retm_data = filteredData
@@ -171,6 +167,7 @@ app.main = (function() {
 		socket.on('return-requested-data', function(data){
 			if (data.which == "retm"){
 				filterRETM(data.body, function(filtered){
+					console.log(filtered)
 					addRETMtoGlobe(filtered['retm']);
 					// getRETMwaveformImages(filtered['retm']);
 					showTemplate("#retm_container", retm_template, filtered); 
