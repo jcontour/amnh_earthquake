@@ -36,6 +36,17 @@ text{
 	margin-bottom: 5px;
 }
 
+.entry:hover {
+	cursor: pointer;
+}
+
+.highlighted {
+	background-color: white;
+	color: black;
+	/*border: solid black;*/
+	/*animation: wiggle 0.5s infinite;*/
+}
+
 h2{
 	font-size: 1.1em;
 	margin: 0;
@@ -44,6 +55,7 @@ h2{
 h3{
 	font-size: .9em;
 	margin: 0;
+	padding: 0 5px; 
 	display: inline-block;
 }
 
@@ -67,6 +79,7 @@ hr{
 
 .retm_region {
 	display: inline-block;
+	padding: 2px 5px;
 }
 
 .locate {
@@ -85,6 +98,25 @@ hr{
 	color: white;
 	border: 2px solid white;
 	padding: 1px 3px;
+}
+
+.retm_wrapper img {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+/* ------------ NEWS STYLING ------------ */
+
+.news h3{
+	padding: 0;
+}
+
+.news p {
+	font-weight: normal;
+	font-size: 0.8em;
+	position: relative;
+	margin: 0 0 10px 0;
 }
 
 /* ------------ ARROW STYLING ------------ */
@@ -113,3 +145,4 @@ i {
 .definition {
 	display: none;
 }
+

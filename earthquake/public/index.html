@@ -68,10 +68,12 @@
         </div>
     </div>
 
+    <div id="temp"></div>
+
     <!-- TEMPLATES -->
     <script id="question_template" type="text/x-handlebars-template">
         {{#each questions}}
-            <div class="entry">
+            <div id="{{id}}" class="entry" data-loc="{{coordinates}}">
                 <i class="arrow up"></i> <h3> {{name}} </h3>
                 <p class="definition"> {{definition}} </p>
             </div>
@@ -90,8 +92,9 @@
     <script id="retm_template" type="text/x-handlebars-template">
         {{#each retm}}
             <div class="retm_wrapper">
-                <div class="retm_region"> {{short_region}} </div>
+                <div id="retm{{@index}}" class="retm_region"> {{short_region}} </div>
                 <div class="locate" data-id="{{@index}}"> locate </div>
+                <img class="waveform" src="{{link}}" />
             </div>
         {{/each}}
     </script>

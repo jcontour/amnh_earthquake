@@ -6,6 +6,7 @@ app.main = (function() {
 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ queuing data calls
+	
 	function callGlobeData(){
 		console.log("calling data for globe")
 		d3.queue(2)				// calling map data
@@ -36,11 +37,10 @@ app.main = (function() {
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ instantiating templates
+	var source, question_template, definition_template, retm_template, news_template;
 
 	function initTemplates(){
 		console.log("initializing templates")
-
-		var source, question_template, definition_template, retm_template, news_template;
 
 		source = $("#question_template").html();
 		question_template = Handlebars.compile(source);
@@ -54,29 +54,16 @@ app.main = (function() {
 		source = $("#news_template").html();
 		news_template = Handlebars.compile(source);
 
-		d3.queue()
-			.defer(d3.json, "data/defs_and_questions.json")
-			.defer(d3.json, "data/retm_data.json")	// <<<<<<<<<<<<<<< WILL NEED TO REPLACE THIS WITH ACTUAL LINK WHEN PUBLISHING
+		socket.emit("get-url", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
 
-			// for list of retm entries
-			// http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=function_name
+		d3.json("data/defs_and_questions.json", function(err, res){
+				var questions = res["questions"]
+				addQuestions(questions);
 
-			// page for each entry use iris_dmc_event_id from
-			// http://ds.iris.edu/ds/nodes/dmc/tools/event/###### 
-
-			.awaitAll( function(error, results){
-				console.log("filling templates");
-				// console.log(results);
-
-				showTemplate("#question_container", question_template, results[0]);
-				showTemplate("#definition_container", definition_template, results[0]);
-				showTemplate("#news_container", news_template, results[0])
-
-				filterRETM(results[1], function(filtered){
-					showTemplate("#retm_container", retm_template, filtered); 
-					attachEvents();
-				})
-			})
+				showTemplate("#question_container", question_template, res);
+				showTemplate("#definition_container", definition_template, res);
+				showTemplate("#news_container", news_template, res)
+		})
 	}
 
 	function showTemplate(div, template, data){
@@ -88,24 +75,70 @@ app.main = (function() {
 	    var coordinates
 
 	    d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", function(err, res){
-	        // console.log(loc, res['results'][0]['geometry']['location']['lat'], res['results'][0]['geometry']['location']['lng'] )
 	        callback(err, {lat: res['results'][0]['geometry']['location']['lat'], lon: res['results'][0]['geometry']['location']['lng'] })
 	    })
+	}
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RETM
+	// http://ds.iris.edu/ds/nodes/dmc/tools/event/ + iris_dmc_event_id
+	// var findInParsed = function(html, selector){
+	//     var check = $(selector, html).get(0);
+	//     if(check)
+	//         return $(check);
+	//     check = $(html).filter(selector).get(0)
+	//     return (check)? $(check) : false;
+	// }
+
+	function findInParsed(html, selector){
+	    return $(selector, html).get(0) || $(html).filter(selector).get(0);
+	}
+
+	var findWaveForm = function(id){
+		var url = "http://ds.iris.edu/ds/nodes/dmc/tools/event/" + id
+		console.log("finding waveform")
+
+		socket.emit("get-waveform", {url: url, which: "waveform"}, function(res){
+			// $('#temp').html($(res).find('img.event-plot').attr("src")); 
+			console.log("waveform res")
+			console.log($(res).find('img.event-plot').attr("src"))					// CAN'T GET IMG LINK OUT OF HTML RESPONSE?!?!?!?!
+
+		});
+
+			// var waveformhtml = $.parseHTML(res);
+
+			// var waveformhtml = $(waveformhtml).filter('.event-plot').attr("src")
+			// console.log(waveformhtml)
+
+
+			// var findimg = findInParsed(waveformhtml, 'event-plot')
+			// console.log(findimg)
+			// var src = $('#temp').children('img.event-plot').attr('src')
+			// console.log(src)
+			// $('#temp').empty()
+		// })
+
 	}
 
 	var retm_data = [];
 
 	function filterRETM(data, callback) {
-		console.log("filtering retm")	
+		console.log("filtering retm")
+		// console.log(data.length)
+		var parse = data.substr(2, data.length-4);
+		var retmdata = $.parseJSON(parse)
+		console.log(retmdata)
 		var filteredData = [];
 		var namelist = [];
 
-		for (var i = 0; i < data['retm'].length; i++) {
-			var name = data['retm'][i].short_region;
+		for (var i = 0; i < retmdata.dmc_evid_retm.length; i++) {
+			var name = retmdata.dmc_evid_retm[i].short_region;
 
 			if ($.inArray(name, namelist) == -1) {	
-				filteredData.push(data['retm'][i])
+				filteredData.push(retmdata.dmc_evid_retm[i])
 				namelist.push(name)
+				if (namelist.length >= 5) {
+					break;
+				}
 			}
 		}
 
@@ -120,10 +153,11 @@ app.main = (function() {
 			console.log("retm queue done");
 			for (var i = 0; i < filteredData.length; i++){
 				filteredData[i].location = res[i]
+				findWaveForm(filteredData[i]["iris_dmc_event_id"])
 			}
 
 			retm_data = filteredData
-			callback({'retm': filteredData.slice(0,10)})
+			callback({'retm': filteredData})
 		});
 	}
 
@@ -133,6 +167,19 @@ app.main = (function() {
 
 	var socketSetup = function(){
 		socket = io.connect();
+
+		socket.on('return-requested-data', function(data){
+			if (data.which == "retm"){
+				filterRETM(data.body, function(filtered){
+					addRETMtoGlobe(filtered['retm']);
+					// getRETMwaveformImages(filtered['retm']);
+					showTemplate("#retm_container", retm_template, filtered); 
+					attachEvents();
+				})
+			} else if (data.which == "waveform"){
+
+			} 
+		})
 		
 		socket.on('knob', function(arduino){
 			console.log("arduino connected: ", arduino);
@@ -142,11 +189,11 @@ app.main = (function() {
 				setupFilters();
 			}
 		})
-
 		socket.on('filter', function(data){
 			filterData(data.time, data.size);
 		})
 	}
+
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION
 
@@ -159,13 +206,26 @@ app.main = (function() {
 			rotateTo(retm_data[num].location.lat, retm_data[num].location.lon)
 		})
 
-		$('.arrow').click(function(){
-			if ($(this).hasClass("up")) {
-				console.log("opening")
-				$(this).removeClass("up").addClass("down").siblings('p').slideDown();
+		$('.entry').click(function(){
+			if ($(this).children("i").hasClass("up")) {
+				$(this).children("i").removeClass("up").addClass("down").siblings('p').slideDown();
+				
+				var data_loc = $(this).attr('data-loc')
+				if (data_loc !== undefined){
+					var loc = data_loc.split(",")
+					rotateTo(loc[0], loc[1])
+				}
 			} else {
-				$(this).removeClass("down").addClass("up").siblings('p').slideUp();
+				$(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
 			}
+		})
+
+		$('.entry').mouseenter(function(){
+			$(this).addClass("highlighted")
+			$(this).children("i").css("border", "solid black").css("border-width", "0 3px 3px 0")
+		}).mouseleave(function(){
+			$(this).removeClass("highlighted")
+			$(this).children("i").css("border", "solid white").css("border-width", "0 3px 3px 0")
 		})
 
 		d3.select("#nTime").on("input", function() {		// time filter
@@ -179,6 +239,9 @@ app.main = (function() {
 			var sizeval = this.value;
 			filterData(timeval, sizeval);
 		})
+		
+		initMouseoverInteraction();
+
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 

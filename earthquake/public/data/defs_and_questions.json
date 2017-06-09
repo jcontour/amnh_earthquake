@@ -19,21 +19,25 @@
    "questions": [
       {  
          "name":"The Ring of Fire",
-         "coordinates":[22.543034, 144.429486],
+         "id": "q01",
+         "coordinates":[36.351429, 153.910524],
          "definition":"question about ring of fire"
       },
       {  
          "name":"Central US",
-         "coordinates":[36.182210, -94.153267],
+         "id": "q02",
+         "coordinates":[36.436640, -94.825492],
          "definition":"question about central us "
       },
       {  
          "name":"Mid-Atlantic Ridge",
+         "id": "q03",
          "coordinates":[23.728751, -44.555315],
          "definition":"question about mid-atlantic ridge"
       },
       {  
          "name":"The Himalayan Mountains",
+         "id": "q04",
          "coordinates":[29.626487, 82.041529],
          "definition":"question about himalayas"
       }

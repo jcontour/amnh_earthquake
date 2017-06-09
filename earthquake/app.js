@@ -1,7 +1,10 @@
 /*---------------------------------------- NODE SETUP ----------------------------------------*/
 var express = require('express'),
 	socket = require("socket.io"), 
-	five = require("johnny-five");
+	five = require("johnny-five"),
+    cors = require('cors'),
+    http = require('http'),
+    request = require('request');
 	
 var app = express();
 var PORT = 4000;
@@ -21,6 +24,18 @@ app.use(function(req, res, next) {
 
 //will look inside this folder for front end of site
 app.use('/', express.static(__dirname + '/public'));
+
+app.use(cors())
+// var whitelist = ['http://ds.iris.edu']
+// var corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   }
+// }
 
 /*----------------------------------------  SETUP ----------------------------------------*/
 
@@ -91,6 +106,27 @@ io.on('connection', function(socket){
     }
 
     // LISTENERS
+    socket.on('get-waveform', function(data, fn){
+        
+        request({
+            url: data.url
+          }, function(error, response, body){
+            console.log('--------------------------------',body)
+            // res.send(body);
+            fn(body)
+          })
+    })
+
+    socket.on('get-url', function(data){
+        request({
+            url: data.url
+          }, function(error, response, body){
+            // console.log('--------------------------------',body)
+            // res.send(body);
+            socket.emit('return-requested-data', {which: data.which, body: body})
+          })
+    })
+
     socket.on('disconnect', function(data){
         console.log("disconnected")
     });
