@@ -16,26 +16,14 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log('incoming request from ---> ' + ip);
+    // console.log('incoming request from ---> ' + ip);
     var url = req.originalUrl;
-    console.log('### requesting ---> ' + url);	// Show the URL user just hit by user
+    // console.log('### requesting ---> ' + url);	             // Show the URL user just hit by user
     next();
 });
 
-//will look inside this folder for front end of site
-app.use('/', express.static(__dirname + '/public'));
-
-app.use(cors())
-// var whitelist = ['http://ds.iris.edu']
-// var corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true)
-//     } else {
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   }
-// }
+app.use('/', express.static(__dirname + '/public'));        // will look inside this folder for front end of site
+app.use(cors())                                             // set up cross-browser origin stuff
 
 /*----------------------------------------  SETUP ----------------------------------------*/
 
@@ -46,10 +34,6 @@ server.listen(PORT, function(){
     console.log('Express server is running at ' + PORT); 
 })
 
-function remap_vals(value, low1, high1, low2, high2) {
-    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
-}
-
 var isConnected = false
 var board = new five.Board()
 var time_pot_val = 0;
@@ -57,6 +41,10 @@ var size_pot_val = 0;
 var curr_time_val, curr_size_val;
 
 /*----------------------------------------  SOCKET.IO APP ----------------------------------------*/
+
+function remap_vals(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
 
 board.on('ready', function () {         // ------------------------------ JOHNNY-FIVE SETUP
     isConnected = true
