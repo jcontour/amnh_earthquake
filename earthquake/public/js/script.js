@@ -10,7 +10,7 @@ app.main = (function() {
 	function callGlobeData(){
 		console.log("calling data for globe")
 		d3.queue(2)				// calling map data
-		.defer(d3.json, "data/tec_boundaries.json")
+		// .defer(d3.json, "data/tec_boundaries.json")
 		.defer(d3.json, "data/history.json")
 		.defer(d3.json, "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson")
 		.awaitAll(function(error, results){
@@ -22,7 +22,7 @@ app.main = (function() {
 	function drawGlobeData(data){
 		console.log("drawing globe")
 
-		var tectonicPlates = data[0];
+		// var tectonicPlates = data[0];
 	    // drawMap('plates', tectonicPlates.features, false);
 
 	    var earthquakes = [];
