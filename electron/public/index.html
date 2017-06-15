@@ -24,11 +24,24 @@
             <hr align="center" width="98%">
 
             <div id="filters">
-                <label for="nTime"> Explore by time of earthquake </label>
-                <input type="range" min="1" max="6" id="nTime">
-                <br>
-                <label for="nSize"> Explore by earthquake magnitude </label>
-                <input type="range" min="1" max="7" id="nSize">
+                <div>
+                    <label for="nSize"> Explore by earthquake magnitude </label>
+                    <input type="range" min="1" max="7" id="nSize">
+                    <div class="filter-key">
+                        <div id="nSize-bg" class="input-bg"></div>
+                        <p class="key-right"> 7.0+ </p>
+                        <p class="key-left"> 1.0 </p>
+                    </div> 
+                </div>
+                <div id="timefiltersection">
+                    <label id="nTime-label" for="nTime"> Explore by earthquake time </label>
+                    <input type="range" min="1" max="6" id="nTime">
+                    <div class="filter-key">
+                        <div id="nTime-bg" class="input-bg"></div>
+                        <p class="timekey key-left"> 30 days ago </p>
+                        <p class="timekey key-right"> Today </p>
+                    </div> 
+                </div>
             </div>
         </div>
 
@@ -52,6 +65,7 @@
             <h2> Recent Earthquake Teachable Moments from IRIS </h2>
             <hr align="center" width="98%">
             <div id="retm_container"> </div>
+            <div id="retm-view"> </div>
         </div>
         <div class="section">
             <h2> US Array of Seismic Stations </h2>
@@ -59,6 +73,14 @@
             <p> This is some info about the US array. What do earthquake waves look like as they travel through the earth? </p>
             <p> Watch this video of the US Array of seismometers to find out. </p>
             <div id="usarray">Watch Now</div>
+
+            <div id="usarray-view">
+                <div id="close-usarray"> <img src="data/close_white.png"/> </div>
+                <video width="800" height="600" controls="controls">
+                    <source src="data/usarray.mp4" type="video/mp4">
+                </video>
+            </div>
+
         </div>
         <div class="section">
             <h2> Earthquakes in the News </h2>
@@ -67,10 +89,16 @@
         </div>
     </div>
 
+    <div id="key">
+        <div id="key-color"></div>
+        <p class="key-left">30 days ago</p>
+        <p class="key-right">Today</p>
+    </div>
+
     <!-- TEMPLATES -->
     <script id="question_template" type="text/x-handlebars-template">
         {{#each questions}}
-            <div id="{{id}}" class="entry" data-loc="{{coordinates}}">
+            <div id="{{id}}" class="q-entry" data-loc="{{coordinates}}">
                 <i class="arrow up"></i> <h3> {{name}} </h3>
                 <p class="definition"> {{definition}} </p>
             </div>
@@ -79,7 +107,7 @@
     
     <script id="definition_template" type="text/x-handlebars-template">
         {{#each definitions}}
-            <div class="entry">
+            <div class="d-entry">
                 <i class="arrow up"></i> <h3> {{term}} </h3>
                 <p class="definition"> {{definition}} </p>
             </div>
@@ -98,9 +126,19 @@
 
     <script id="news_template" type="text/x-handlebars-template">
         {{#each news}}
-            <div class="news" data-link="{{filepath}}">
-                <h3> {{title}} </h3>
-                <p> {{publication}} </p>
+            <div>
+                <div class="news">
+                    <h3> {{title}} </h3>
+                    <p> {{publication}} </p>
+                </div>
+                <div class="view-news closed">
+                    <div class="close-view-news"> <img src="data/close_white.png"/> </div>
+                    <div class="view-news-container">
+                        <img src="data/news/turkey_1999.jpg" width="100%" height="100%"/>
+                        <img src="data/news/turkey_1999.jpg" width="100%" height="100%"/>
+                        <img src="data/news/turkey_1999.jpg" width="100%" height="100%"/>
+                    </div>
+                </div>
             </div>
         {{/each}}
     </script>

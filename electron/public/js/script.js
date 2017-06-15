@@ -11,7 +11,6 @@ app.main = (function() {
 	function callGlobeData(){
 		console.log("calling data for globe")
 		d3.queue(2)				// calling map data
-		.defer(d3.json, "data/tec_boundaries.json")
 		.defer(d3.json, "data/history.json")
 		.defer(d3.json, "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson")
 		.awaitAll(function(error, results){
@@ -30,8 +29,8 @@ app.main = (function() {
 
 	    var earthquakes = [];
 	    
-	    for (var i = 0; i <data[1].features.length; i++){ earthquakes.push(data[1].features[i]) }		// UNCOMMENT FOR MAJOR LAG 
-	    for (var i = 0; i <data[2].features.length; i++){ earthquakes.push(data[2].features[i]) };
+	    for (var i = 0; i <data[0].features.length; i++){ earthquakes.push(data[0].features[i]) }		// UNCOMMENT FOR MAJOR LAG 
+	    for (var i = 0; i <data[1].features.length; i++){ earthquakes.push(data[1].features[i]) };
 		earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
 		
 		drawData(earthquakes);
@@ -57,7 +56,8 @@ app.main = (function() {
 		source = $("#news_template").html();
 		news_template = Handlebars.compile(source);
 
-		// socket.emit("get-url", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
+		// calling data for the templates
+		ipcRenderer.send("get-url", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
 
 		d3.json("data/defs_and_questions.json", function(err, res){
 				var questions = res["questions"]
@@ -78,6 +78,7 @@ app.main = (function() {
 	    var coordinates
 
 	    d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", function(err, res){
+	    	// sconsole.log(res)
 	        callback(err, {lat: res['results'][0]['geometry']['location']['lat'], lon: res['results'][0]['geometry']['location']['lng'] })
 	    })
 	}
@@ -104,9 +105,9 @@ app.main = (function() {
 		    type:'HEAD',
 		    error:
 		        function(){
-		            // socket.emit("get-waveform", {id: id, which: "waveform"}, function(res){
-						// callback(res);										// <<<<<<<<<<<<<<<<<<<< HOW DO I INSERT THIS INTO THE FILTERED RETM DATA ? ASYNC PROBLEMS
-					// });
+		            ipcRenderer.send("get-waveform", {id: id, which: "waveform"}, function(res){
+						callback(res);										// <<<<<<<<<<<<<<<<<<<< HOW DO I INSERT THIS INTO THE FILTERED RETM DATA ? ASYNC PROBLEMS
+					});
 		        },
 		    success:
 		        function(){
@@ -122,7 +123,7 @@ app.main = (function() {
 		// console.log(data.length)
 		var parse = data.substr(2, data.length-4);
 		var retmdata = $.parseJSON(parse)
-		console.log(retmdata)
+		// console.log(retmdata)
 		var filteredData = [];
 		var namelist = [];
 
@@ -137,6 +138,8 @@ app.main = (function() {
 				}
 			}
 		}
+
+		// console.log("namelist", namelist)
 
 		var q = d3.queue(1);
 
@@ -164,32 +167,26 @@ app.main = (function() {
 
 	var ipcSetup = function(){
 
-		ipcRenderer.send('connect', 'ping')
-
-		ipcRenderer.on('connect-reply', (event, arg) => {
-			console.log(arg)
-		});
-
 		ipcRenderer.on('filter', (event, arg) => {
 			console.log(arg)
-			// filterData(arg.time, arg.size);
+			filterData(arg.time, arg.size);
 		});
 
 		ipcRenderer.on('return-requested-data', (event, arg) => {
 			if (arg.which == "retm"){
 				filterRETM(arg.body, function(filtered){
-					console.log(filtered)
 					addRETMtoGlobe(filtered['retm']);
-					// getRETMwaveformImages(filtered['retm']);
 					showTemplate("#retm_container", retm_template, filtered); 
 					attachEvents();
 				})
 			} else if (arg.which == "waveform"){
 
-			} 
+			} else {
+				console.log(arg)
+			}
 		})
 		
-		ipcRenderer.on('knob', (event, arg) => {
+		ipcRenderer.on('knob-status', (event, arg) => {
 			console.log("arduino connected: ", arg);
 			if (arg) {
 				$('#filter_container').hide();				
@@ -198,21 +195,46 @@ app.main = (function() {
 			}
 		})
 
+		ipcRenderer.on('return-requested-data', (event, arg) => {
+
+		})
+
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION
+	var checkifthingsareopen = function(video, news){
+		if (video || news) {
+			$('#usarray-view').slideUp();
+			$('.news').each(function(){
+				$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
+			})
+			isVideoOpen = false;
+			isNewsOpen = false;
+		}
+	}
+
+	var isVideoOpen = false;
+	var isNewsOpen = false;
 
 	var attachEvents = function(){
+
 		console.log("attaching events")
 
 		$('.locate').click( function(){
+			checkifthingsareopen(isVideoOpen, isNewsOpen);
 			var num = $(this).attr("data-id")
 			console.log("locate ", retm_data[num].short_region)
 			rotateTo(retm_data[num].location.lat, retm_data[num].location.lon)
 		})
 
-		$('.entry').click(function(){
+		$('.q-entry').click(function(){
+			checkifthingsareopen(isVideoOpen, isNewsOpen);
 			if ($(this).children("i").hasClass("up")) {
+				
+				$('.q-entry').each(function(){
+					$(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
+				})
+
 				$(this).children("i").removeClass("up").addClass("down").siblings('p').slideDown();
 				
 				var data_loc = $(this).attr('data-loc')
@@ -225,12 +247,64 @@ app.main = (function() {
 			}
 		})
 
+		$('.d-entry').click(function(){
+			if ($(this).children("i").hasClass("up")) {
+
+				$('.d-entry').each(function(){
+					$(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
+				})
+
+				$(this).children("i").removeClass("up").addClass("down").siblings('p').slideDown();
+
+			} else {
+				$(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
+			}
+		})
+
 		$('.entry').mouseenter(function(){
 			$(this).addClass("highlighted")
 			$(this).children("i").css("border", "solid black").css("border-width", "0 3px 3px 0")
 		}).mouseleave(function(){
 			$(this).removeClass("highlighted")
 			$(this).children("i").css("border", "solid white").css("border-width", "0 3px 3px 0")
+		})
+
+		$('#usarray').click(function(){
+			$('.news').each(function(){
+				$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
+			})
+
+			isVideoOpen = true;
+			$('#usarray-view').slideDown();
+
+			setTimeout(function(){
+			  if (isVideoOpen){
+			  	$('#usarray-view').slideUp();
+			  }
+			}, 180000);
+
+		})
+
+		$('#close-usarray').click(function(){
+			isVideoOpen = false;
+			$('#usarray-view').slideUp();
+		})
+
+		$('.news').click(function(){
+			if ($(this).siblings('.view-news').hasClass("closed")) {
+				$('.news').each(function(){
+					$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
+				})
+				$(this).siblings('.view-news').removeClass("closed").addClass("open").slideDown();
+				isNewsOpen = true;
+			} else {
+				$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
+			}
+		})
+
+		$('.close-view-news').click(function(){
+			isNewsOpen = false;
+			$(this).parent().removeClass("open").addClass("closed").slideUp()
 		})
 
 		d3.select("#nTime").on("input", function() {		// time filter
@@ -246,7 +320,6 @@ app.main = (function() {
 		})
 		
 		initMouseoverInteraction();
-
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 
@@ -264,6 +337,10 @@ app.main = (function() {
 		setupGlobe();
 		callGlobeData();
 		attachEvents();
+
+		setTimeout(function(){
+		  ipcRenderer.send('knob', 'test');
+		}, 2000);
 	}
 
 	return {

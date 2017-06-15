@@ -95,7 +95,7 @@ var drawData = function(earthquakes){
                         pixelOffset : new Cesium.Cartesian2(15, 0),
                         scaleByDistance : new Cesium.NearFarScalar(1.5e2, 2.0, 1.5e7, 0.5),
                     },
-            position : Cesium.Cartesian3.fromDegrees(lat, lon, eq_time(date)*25000),
+            position : Cesium.Cartesian3.fromDegrees(lat, lon, eq_time(date)*1000),
             point : {
                 pixelSize : eq_size(date, mag),
                 color : Cesium.Color.fromCssColorString(eq_color(date)),
@@ -122,7 +122,7 @@ var addQuestions = function(data){
 }
 
 var addRETMtoGlobe = function(data){
-    console.log(data)
+    // console.log(data)
     for (var i = 0; i < data.length; i++){
         viewer.entities.add({
             position : Cesium.Cartesian3.fromDegrees(data[i]["location"]["lon"], data[i]["location"]["lat"], 200000),

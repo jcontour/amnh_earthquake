@@ -8,15 +8,10 @@ const url = require('url')
 let mainWindow
 
 const {ipcMain} = require('electron')
-// ipcMain.on('asynchronous-message', (event, arg) => {
-//   console.log(arg)  // prints "ping"
-//   event.sender.send('asynchronous-reply', 'pong')
-// })
 
-// ipcMain.on('synchronous-message', (event, arg) => {
-//   console.log(arg)  // prints "ping"
-//   event.returnValue = 'pong'
-// })
+var cors = require('cors'),
+    request = require('request'),
+    fs = require('fs');
 
 /*----------------------------------------  Johhny-Five */
 
@@ -24,6 +19,7 @@ var five = require("johnny-five")
 
 var isConnected = false
 var board = new five.Board()
+var time_pot, size_pot;
 var time_pot_val = 0;
 var size_pot_val = 0; 
 var curr_time_val, curr_size_val;
@@ -33,7 +29,7 @@ function remap_vals(value, low1, high1, low2, high2) {
 }
 
 board.on('ready', function () {
-  // isConnected = true
+  isConnected = true
   console.log("board connected!")
 
   size_pot = new five.Sensor({
@@ -57,7 +53,7 @@ board.on('ready', function () {
       time_pot_val = curr_time_val;
       console.log( {time: time_pot_val, size: size_pot_val} );
       var pot_data = {time: time_pot_val, size: size_pot_val}
-      ipcMain.send('filter', pot_data );
+      mainWindow.webContents.send('filter', pot_data );
     }
   });
 
@@ -67,18 +63,25 @@ board.on('ready', function () {
       size_pot_val = curr_size_val;
       console.log( {time: time_pot_val, size: size_pot_val} );
       var pot_data = {time: time_pot_val, size: size_pot_val}
-      ipcMain.send('filter', pot_data );
+      mainWindow.webContents.send('filter', pot_data );
     }
   });
 })
 
 /*----------------------------------------  IPC COMMUNICATION */
 
-ipcMain.on('connect', (event, arg) => {
-  console.log(arg)
-  event.sender.send('connect-reply', 'pong')
+ipcMain.on('get-url', (event, arg) => {
+  request({
+    url: arg.url
+  }, function(error, response, body){
+    // console.log('--------------------------------',body)
+    event.sender.send('return-requested-data', {which: arg.which, body: body})
+  })
 })
 
+ipcMain.on('knob', (event, arg) =>{
+  event.sender.send('knob-status', isConnected)
+})
 
 
 /*----------------------------------------  create window */
@@ -98,6 +101,7 @@ function createWindow () {
   mainWindow.on('closed', function () {
     mainWindow = null
   })
+
 }
 
 app.on('ready', createWindow)
@@ -112,4 +116,5 @@ app.on('activate', function () {
   if (mainWindow === null) {
     createWindow() 
   }
+
 })

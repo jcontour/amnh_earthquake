@@ -30,13 +30,15 @@ text{
 	background-color: rgba(0,0,0, 0.5);
 	padding: 20px 20px 15px 20px;
 	margin: 5px 0px;
+	position: relative;
 }
 
-.entry {
+.q-entry, .d-entry {
 	margin-bottom: 5px;
+	padding-left: 5px;
 }
 
-.entry:hover {
+.q-entry:hover, .d-entry:hover {
 	cursor: pointer;
 }
 
@@ -45,6 +47,15 @@ text{
 	color: black;
 	/*border: solid black;*/
 	/*animation: wiggle 0.5s infinite;*/
+}
+
+h1:hover, h2:hover, p:hover{
+	cursor: default;
+}
+
+h1 {
+	text-transform: uppercase;
+	width: 200%; 
 }
 
 h2{
@@ -69,6 +80,126 @@ hr{
 	border-width: 1px;
 	border-style: solid;
 }
+
+/* ------------ KEY STYLING ------------ */
+
+#key {
+	width: 500px;
+	position: absolute;
+	bottom: 50px;
+	left: calc(50vw - 250px);
+}
+
+#key-color {
+	width: 100%;
+	/*margin: 0 10%;*/
+	height: 15px;
+	background-image: linear-gradient(to left, #FFD13F, #A52710);
+}
+
+#key p {
+	margin: 5px 0;
+	text-transform: uppercase;
+	font-size: .8em;
+}
+
+.key-left{
+	position: relative;
+	float: left;
+}
+
+.key-right {
+	position: relative;
+	float: right;
+}
+
+/* ------------ SLIDER STYLING ------------ */
+
+#timefiltersection {
+	margin-top: 20px;
+}
+
+label {
+	font-size: .8em;
+}
+
+#nTime-label {
+	position: relative;
+	left: -12px;
+}
+
+input {
+	width: 100%;
+	margin-top: 15px;
+}
+
+input[type=range] {
+	-webkit-appearance: none; 
+	width: 100%; 
+	background: transparent;
+}
+
+input[type=range]:focus {
+	outline: none; 
+}
+
+input[type=range]::-ms-track {
+	width: 100%;
+	cursor: pointer;
+
+	background: transparent; 
+	border-color: transparent;
+	color: transparent;
+}
+
+input[type=range]::-webkit-slider-thumb {
+	position: relative;
+	z-index: 10;
+	top: 10px;
+	border: 2px solid white;
+	height: 35px;
+	width: 5px;
+	border-radius: 0px;
+	background: rgba(0,0,0,0);
+	cursor: pointer;
+	-webkit-appearance: none;
+	margin-top: -15.5px;
+}
+
+.filter-key {
+	width: 100%;
+	height: 25px;
+	margin-bottom: 8px;
+	position: relative;
+	top: -20px;
+	z-index: 5;
+}
+
+.filter-key p {
+	font-size: .6em;
+	text-transform: uppercase;
+}
+
+#nSize-bg {
+	width: 0;
+	height: 0;
+	border-bottom: 25px solid #dddddd;
+	border-left: 273px solid transparent;
+}
+
+#nTime-bg {
+  height: 15px;
+  cursor: pointer;
+  /*background: #3071a9;*/
+  background-image: linear-gradient(to right, #303030, #dddddd);
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+.timekey{
+	top: 5px;
+}
+
 
 /* ------------ RETM STYLING ------------ */
 
@@ -106,6 +237,47 @@ hr{
 	left: 0;
 }
 
+#retm-view{
+	position: absolute;
+	right: 103%;
+	top: -4px;
+}
+
+/* ------------ USARRAY STYLING ------------ */
+
+
+
+#usarray {
+	padding: 5px;
+	background-color: white;
+	color: black;
+	border: 2px solid white;
+	display: inline-block;
+	font-style: bold;
+}
+
+#usarray:hover{
+	background-color: black;
+	color: white;
+	cursor: pointer;
+}
+
+#usarray-view{
+	position: fixed;
+	left: calc(50vw - 400px);
+	top: 7em;
+	display: none;
+	padding: 2px 4px;
+	border: 2px solid white;
+	background-color: rgba(0,0,0,0.5)
+}
+
+#close-usarray{
+	position: absolute;
+	right: -38px;
+	cursor: pointer;
+}
+
 /* ------------ NEWS STYLING ------------ */
 
 .news h3{
@@ -115,8 +287,34 @@ hr{
 .news p {
 	font-weight: normal;
 	font-size: 0.8em;
+	font-style: italic;
 	position: relative;
 	margin: 0 0 10px 0;
+}
+
+.view-news {
+	position: fixed;
+	top: 7em;
+	left: calc(50vw - 300px);
+	width: 600px;
+	height: 800px;
+	display: none;
+}
+
+.view-news-container {
+	width: 100%;
+	height: 100%;
+	overflow: scroll;
+}
+
+.news, .news h3, .news p{
+	cursor: pointer
+}
+
+.close-view-news {
+	position: absolute;
+	right: -38px;
+	cursor: pointer;
 }
 
 /* ------------ ARROW STYLING ------------ */
