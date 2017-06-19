@@ -37,45 +37,56 @@
          "name":"Central US",
          "id": "q03",
          "coordinates":[36.436640, -94.825492],
-         "definition":"question about central us "
+         "definition":"Not all earthquakes occur at plate boundaries. Human activity constantly changes the Earth, both above and below the surface. Hydraulic fracturing, or “fracking” has been shown to cause earthquakes. Many earthquakes of this kind are happening in the central United States. When was the most recent?"
       },
       {  
          "name":"Mid-Atlantic Ridge",
          "id": "q04",
          "coordinates":[23.728751, -44.555315],
-         "definition":"question about mid-atlantic ridge"
+         "definition":"Deep under the Atlantic Ocean, the Eurasian and North American Plates are moving away from each other at a rate of almost an inch a year. What kinds of activity would you expect to find at a divergent boundary like this?"
       },
       {  
          "name":"The Himalayan Mountains",
          "id": "q05",
          "coordinates":[29.626487, 82.041529],
-         "definition":"question about himalayas"
+         "definition":"As the Indian subcontinent slides beneath the Eurasian Plate, a formidable mountain range has risen. The Himalayas mark this plate boundary and are home to some of the highest mountains on Earth. Can you find Mount Everest?"
       }
    ],
    "news": [
       {
-         "title":"Destruction and Tsunami After Plates Collide Again, 2017",
-         "publication": "New York Times",
-         "filepath":"data/news/peru_2017_",
-         "numpages": 1
+         "title":"Above All Else, Eastern Quake Rattles Nerves",
+         "info": "East Coast, USA, 2011",
+         "filepath": [ "data/news/usa_2011_1", "data/news/usa_2011_2", "data/news/usa_2011_3", "data/news/usa_2011_4", "data/news/usa_2011_5" ]
       },
       {
-         "title":"A Look at Nepal's Progress in Earthquake Recovery, 2017",
-         "publication": "New York Times",
-         "filepath":"data/news/nepal_2017_",
-         "numpages": 1
+         "title":"Italians Comb Through Rubble After Quake",
+         "info": "Italy, 2009",
+         "filepath":[ "data/news/italy_2009_1","data/news/italy_2009_2", "data/news/italy_2009_3", "data/news/italy_2009_4" ]
       },
       {
-         "title":"Earthquake Shakes Southern Greece, 2008",
-         "publication": "New York Times",
-         "filepath":"data/news/greece_2008_",
-         "numpages": 1
+         "title":"Haiti Lies in Ruins; Grim Search for Untold Dead",
+         "info": "Haiti, 2010",
+         "filepath":[ "data/news/haiti_2010_1", "data/news/haiti_2010_2", "data/news/haiti_2010_3", "data/news/haiti_2010_4" ]
       },
       {
-         "title":"Earthquake in Turkey, 1999",
-         "publication": "New York Times",
-         "filepath":"data/news/turkey_1999_",
-         "numpages": 1
+         "title":"Thousands at risk of starving in quake aid shortfall",
+         "info": "Kashmir, 2005",
+         "filepath":[ "data/news/kashmir_2005_1", "data/news/kashmir_2005_2" ]
+      },
+      {
+         "title":"Pakistan Appeals for Help as Rescuers Dig by Hand",
+         "info": "Pakistan, 2005",
+         "filepath":[ "data/news/pakistan_2005_1", "data/news/pakistan_2005_2", "data/news/pakistan_2005_3", "data/news/pakistan_2005_4", "data/news/pakistan_2005_5" ]
+      },
+      {
+         "title":"Powerful Quake Ravages China, Killing Thousands",
+         "info": "China, 2008",
+         "filepath": [ "data/news/china_2008_1", "data/news/china_2008_2", "data/news/china_2008_3", "data/news/china_2008_4", "data/news/china_2008_5" ]
+      },
+      {
+         "title":"Thousands Die as Quake-Spawned Waves Crash Onto Coastlines Across Southern Asia",
+         "info": "Indonesia, 2004",
+         "filepath": [ "data/news/indonesia_2004_1", "data/news/indonesia_2004_2", "data/news/indonesia_2004_3", "data/news/indonesia_2004_4", "data/news/indonesia_2004_5" ]
       }
    ]
 }

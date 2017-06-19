@@ -71,9 +71,6 @@ var setupGlobe = function(){
 
 var drawData = function(earthquakes){
     console.log("drawing earthquakes")
-    // console.log(earthquakes[0])
-
-    // points = new Cesium.CustomDataSource("points")
 
     for (var i = 0; i < earthquakes.length; i++) {
     // for (var i = earthquakes.length - 1; i > earthquakes.length - 101; i--) {
@@ -125,22 +122,15 @@ var addRETMtoGlobe = function(data){
     // console.log(data)
     for (var i = 0; i < data.length; i++){
         viewer.entities.add({
-            position : Cesium.Cartesian3.fromDegrees(data[i]["location"]["lon"], data[i]["location"]["lat"], 200000),
+            position : Cesium.Cartesian3.fromDegrees(data[i]["location"]["lng"], data[i]["location"]["lat"], 200000),
             point : {
                 pixelSize : 50,
                 color : Cesium.Color.fromCssColorString('#A527FF'),
                 outlineWidth: 1
             },
-            billboard : {
-                image : "data/" + data[i]["iris_dmc_event_id"] + "_waveform.png",
-                scale : 0.8,
-                horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
-                verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
-                show : false
-            },
             id : "retm" + i,
             name : "retm",
-            description : data[i]["short_region"]
+            description : data[i]["iris_dmc_event_id"]
         });
     }
 }
@@ -170,14 +160,20 @@ var highlightPoint = function(type, object, isHighlighted){
             $('#'+id).removeClass("highlighted")
             $('#'+id).children("i").css("border", "solid white").css("border-width", "0 3px 3px 0")
         }
-    } else {
+    } else {            // retm
         var id = object["id"]["_id"]
+        var eqid = object["id"]["_description"]["_value"]
+
         if (isHighlighted){
-            object["id"]["_billboard"]["_show"]["_value"] = true;
             $('#'+id).addClass("highlighted")
+            var info = $('#'+id).attr("data-earthquake")
+            console.log(info)
+            $('#retm-info').text(info);
+            $('#retm-waveform').attr("src", "data/" + eqid + "_waveform.png");
+            $('#retm-view').slideDown();
         } else {
-            object["id"]["_billboard"]["_show"]["_value"] = false;
             $('#'+id).removeClass("highlighted")
+            $('#retm-view').slideUp();
         }
     }
 }
@@ -195,18 +191,14 @@ var initMouseoverInteraction = function(){
                 if (prevPickedObject !== pickedObject && prevPickedObject !== undefined ){
                     if (prevPickedObject["id"]["_name"] == "questionSpot"){
                         highlightPoint("question", prevPickedObject, false)
-                        // highlightQuestion(prevPickedObject["id"]["_id"], false)
                     } else if(prevPickedObject["id"]["_name"] == "retm"){
-                        // highlightRETM(prevPickedObject["id"]["_id"], false)
                         highlightPoint("retm", prevPickedObject, false)
                     } else {
                         highlightPoint("eq", prevPickedObject, false)
-                        // showLabel(prevPickedObject, false)
                     }
                 }
 
                 if (pickedObject["id"]["_name"] == "questionSpot"){
-                    // highlightQuestion(pickedObject["id"]["_id"], true)
                     highlightPoint("question", pickedObject, true)
                 } else if (pickedObject["id"]["_name"] == "retm"){
                     highlightPoint("retm", pickedObject, true)
@@ -229,10 +221,14 @@ var initMouseoverInteraction = function(){
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 }
 
+var spinGlobe = function(angle) {
+    viewer.camera.rotateRight(angle);
+}
 
-var rotateTo = function(lat, lon){                  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rotate globe to location
+var rotateTo = function(lat, lon, time){               // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rotate globe to location
     viewer.camera.flyTo({
-        destination : Cesium.Cartesian3.fromDegrees(lon, lat, viewer.camera.positionCartographic.height)
+        destination : Cesium.Cartesian3.fromDegrees(lon, lat, 15000000),
+        duration: time
     });
 }
 

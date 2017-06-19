@@ -15,17 +15,12 @@ app.main = (function() {
 		.defer(d3.json, "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson")
 		.awaitAll(function(error, results){
 			if (error) throw error;
-			// console.log(results)
 			drawGlobeData(results);
 		})
 	}
 
 	function drawGlobeData(data){
 		console.log("drawing globe")
-
-
-		// var tectonicPlates = data[0];
-	    // drawMap('plates', tectonicPlates.features, false);
 
 	    var earthquakes = [];
 	    
@@ -57,7 +52,7 @@ app.main = (function() {
 		news_template = Handlebars.compile(source);
 
 		// calling data for the templates
-		ipcRenderer.send("get-url", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
+		ipcRenderer.send("get-retm", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
 
 		d3.json("data/defs_and_questions.json", function(err, res){
 				var questions = res["questions"]
@@ -74,96 +69,12 @@ app.main = (function() {
 		$(div).html(template(data));
 	}
 
-	var findLatLon = function(loc, callback){
-	    var coordinates
-
-	    d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", function(err, res){
-	    	// sconsole.log(res)
-	        callback(err, {lat: res['results'][0]['geometry']['location']['lat'], lon: res['results'][0]['geometry']['location']['lng'] })
-	    })
-	}
-
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RETM
-	// http://ds.iris.edu/ds/nodes/dmc/tools/event/ + iris_dmc_event_id
-	// var findInParsed = function(html, selector){
-	//     var check = $(selector, html).get(0);
-	//     if(check)
-	//         return $(check);
-	//     check = $(html).filter(selector).get(0)
-	//     return (check)? $(check) : false;
-	// }
-
-	function findInParsed(html, selector){
-	    return $(selector, html).get(0) || $(html).filter(selector).get(0);
-	}
-
-	var findWaveForm = function(id, callback){
-		console.log("finding waveform")
-
-		$.ajax({								// check if picture exists before calling
-		    url:"data/"+id+"_waveform.png",
-		    type:'HEAD',
-		    error:
-		        function(){
-		            ipcRenderer.send("get-waveform", {id: id, which: "waveform"}, function(res){
-						callback(res);										// <<<<<<<<<<<<<<<<<<<< HOW DO I INSERT THIS INTO THE FILTERED RETM DATA ? ASYNC PROBLEMS
-					});
-		        },
-		    success:
-		        function(){
-		            console.log("picture!" + id)
-		        }
-		});
-	}
 
 	var retm_data = [];
 
-	function filterRETM(data, callback) {
-		console.log("filtering retm")
-		// console.log(data.length)
-		var parse = data.substr(2, data.length-4);
-		var retmdata = $.parseJSON(parse)
-		// console.log(retmdata)
-		var filteredData = [];
-		var namelist = [];
 
-		for (var i = 0; i < retmdata.dmc_evid_retm.length; i++) {
-			var name = retmdata.dmc_evid_retm[i].short_region;
-
-			if ($.inArray(name, namelist) == -1) {	
-				filteredData.push(retmdata.dmc_evid_retm[i])
-				namelist.push(name)
-				if (namelist.length >= 5) {
-					break;
-				}
-			}
-		}
-
-		// console.log("namelist", namelist)
-
-		var q = d3.queue(1);
-
-		for (var i = 0; i < filteredData.length; i++){
-		  q.defer(findLatLon, filteredData[i].short_region);
-		}
-
-		q.awaitAll(function(err, res) {
-			if (err) throw err;
-			console.log("retm queue done");
-			for (var i = 0; i < filteredData.length; i++){
-				filteredData[i].location = res[i]
-				findWaveForm(filteredData[i]["iris_dmc_event_id"], function(info){
-					console.log(info)
-				})
-
-			}
-
-			retm_data = filteredData
-			callback({'retm': filteredData})
-		});
-	}
-
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SOCKET STUFF
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IPC COMMUNICATION STUFF
 
 	var ipcSetup = function(){
 
@@ -172,18 +83,12 @@ app.main = (function() {
 			filterData(arg.time, arg.size);
 		});
 
-		ipcRenderer.on('return-requested-data', (event, arg) => {
-			if (arg.which == "retm"){
-				filterRETM(arg.body, function(filtered){
-					addRETMtoGlobe(filtered['retm']);
-					showTemplate("#retm_container", retm_template, filtered); 
-					attachEvents();
-				})
-			} else if (arg.which == "waveform"){
-
-			} else {
-				console.log(arg)
-			}
+		ipcRenderer.on('return-retm', (event, arg) => {
+			console.log(arg)
+			retm_data = arg
+			addRETMtoGlobe(arg);
+			showTemplate("#retm_container", retm_template, {"retm": arg}); 
+			attachEvents();
 		})
 		
 		ipcRenderer.on('knob-status', (event, arg) => {
@@ -194,14 +99,37 @@ app.main = (function() {
 				setupFilters();
 			}
 		})
-
-		ipcRenderer.on('return-requested-data', (event, arg) => {
-
-		})
-
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION
+	
+
+	var checkInactivity = function(){
+		console.log("tracking inactivity")
+		var idleTime = 0;
+		var isInactive = false;
+		$(document).ready(function () {
+		    var idleInterval = setInterval(timerIncrement, 100); // testing w 5 seconds
+		    $(this).mousemove(function (e) {
+		        idleTime = 0;
+		        isInactive = false;
+		    });
+		});
+
+		function timerIncrement() {
+			var delay = 1200	// delay = 2 min
+		    idleTime = idleTime + 1;
+		    if (idleTime > delay) {
+		        isInactive = true;
+		        if(isInactive && idleTime < delay + 20) {
+		        	rotateTo(11.241288, -76.651682, 2)
+		        } else {
+		        	spinGlobe(0.005)
+		        }
+		    }
+		}
+	}
+
 	var checkifthingsareopen = function(video, news){
 		if (video || news) {
 			$('#usarray-view').slideUp();
@@ -224,10 +152,11 @@ app.main = (function() {
 			checkifthingsareopen(isVideoOpen, isNewsOpen);
 			var num = $(this).attr("data-id")
 			console.log("locate ", retm_data[num].short_region)
-			rotateTo(retm_data[num].location.lat, retm_data[num].location.lon)
+			rotateTo(retm_data[num].location.lat, retm_data[num].location.lng, 2)
 		})
 
 		$('.q-entry').click(function(){
+			// console.log("clicked q")
 			checkifthingsareopen(isVideoOpen, isNewsOpen);
 			if ($(this).children("i").hasClass("up")) {
 				
@@ -240,7 +169,7 @@ app.main = (function() {
 				var data_loc = $(this).attr('data-loc')
 				if (data_loc !== undefined){
 					var loc = data_loc.split(",")
-					rotateTo(loc[0], loc[1])
+					rotateTo(loc[0], loc[1], 2)
 				}
 			} else {
 				$(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
@@ -248,6 +177,7 @@ app.main = (function() {
 		})
 
 		$('.d-entry').click(function(){
+			// console.log("clicked d")
 			if ($(this).children("i").hasClass("up")) {
 
 				$('.d-entry').each(function(){
@@ -261,7 +191,7 @@ app.main = (function() {
 			}
 		})
 
-		$('.entry').mouseenter(function(){
+		$('.q-entry').mouseenter(function(){
 			$(this).addClass("highlighted")
 			$(this).children("i").css("border", "solid black").css("border-width", "0 3px 3px 0")
 		}).mouseleave(function(){
@@ -269,10 +199,20 @@ app.main = (function() {
 			$(this).children("i").css("border", "solid white").css("border-width", "0 3px 3px 0")
 		})
 
+		$('.d-entry').mouseenter(function(){
+			$(this).addClass("highlighted")
+			$(this).children("i").css("border", "solid black").css("border-width", "0 3px 3px 0")
+		}).mouseleave(function(){
+			$(this).removeClass("highlighted")
+			$(this).children("i").css("border", "solid white").css("border-width", "0 3px 3px 0")
+		})
+
+
 		$('#usarray').click(function(){
 			$('.news').each(function(){
 				$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
 			})
+			isNewsOpen = false;
 
 			isVideoOpen = true;
 			$('#usarray-view').slideDown();
@@ -280,6 +220,7 @@ app.main = (function() {
 			setTimeout(function(){
 			  if (isVideoOpen){
 			  	$('#usarray-view').slideUp();
+			  	isVideoOpen = false;
 			  }
 			}, 180000);
 
@@ -291,6 +232,9 @@ app.main = (function() {
 		})
 
 		$('.news').click(function(){
+			$('#usarray-view').slideUp();
+			isVideoOpen = false;
+			
 			if ($(this).siblings('.view-news').hasClass("closed")) {
 				$('.news').each(function(){
 					$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
@@ -300,6 +244,15 @@ app.main = (function() {
 			} else {
 				$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
 			}
+
+			setTimeout(function(){
+				if (isNewsOpen){
+					$('.news').each(function(){
+						$(this).siblings('.view-news').removeClass("open").addClass("closed").slideUp();
+					})
+					isNewsOpen = false;
+				}
+			}, 180000);
 		})
 
 		$('.close-view-news').click(function(){
@@ -337,6 +290,7 @@ app.main = (function() {
 		setupGlobe();
 		callGlobeData();
 		attachEvents();
+		checkInactivity();
 
 		setTimeout(function(){
 		  ipcRenderer.send('knob', 'test');
