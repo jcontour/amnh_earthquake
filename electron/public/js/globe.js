@@ -108,7 +108,7 @@ var addQuestions = function(data){
         viewer.entities.add({
             position : Cesium.Cartesian3.fromDegrees(data[i]["coordinates"][1], data[i]["coordinates"][0], 200000),
             billboard :{
-                image : 'data/question.png',
+                image : 'req/question.png',
                 scale: 0.05,
             },
             id : data[i]["id"],

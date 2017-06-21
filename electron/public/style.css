@@ -53,10 +53,6 @@ h1:hover, h2:hover, p:hover{
 	cursor: default;
 }
 
-h1 {
-	text-transform: uppercase;
-	width: 200%; 
-}
 
 h2{
 	font-size: 1.1em;
@@ -79,6 +75,10 @@ hr{
 	margin-bottom: 15px;
 	border-width: 1px;
 	border-style: solid;
+}
+
+#logo {
+	margin: 20px 0px;	
 }
 
 /* ------------ KEY STYLING ------------ */
