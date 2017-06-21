@@ -46,7 +46,7 @@ var eq_size = function(date, mag){
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SETUP CESIUM
 
 var setupGlobe = function(){
-    console.log("setting up globe")
+    // console.log("setting up globe")
     //new Cesium object, displays planet, generic zoom/display level
     viewer = new Cesium.Viewer('cesiumContainer', {
         imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
@@ -70,7 +70,7 @@ var setupGlobe = function(){
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DRAWING ALL ENTITIES ON GLOBE
 
 var drawData = function(earthquakes){
-    console.log("drawing earthquakes")
+    // console.log("drawing earthquakes")
 
     for (var i = 0; i < earthquakes.length; i++) {
     // for (var i = earthquakes.length - 1; i > earthquakes.length - 101; i--) {
@@ -167,7 +167,7 @@ var highlightPoint = function(type, object, isHighlighted){
         if (isHighlighted){
             $('#'+id).addClass("highlighted")
             var info = $('#'+id).attr("data-earthquake")
-            console.log(info)
+            // console.log(info)
             $('#retm-info').text(info);
             $('#retm-waveform').attr("src", "data/" + eqid + "_waveform.png");
             $('#retm-view').slideDown();

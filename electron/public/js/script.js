@@ -7,20 +7,19 @@ app.main = (function() {
 	const {ipcRenderer} = require('electron') 
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ queuing data calls
-	
-	function callGlobeData(){
-		console.log("calling data for globe")
-		d3.queue(2)				// calling map data
+
+	function useCachedEQs() {
+		d3.queue(1)
 		.defer(d3.json, "data/history.json")
-		.defer(d3.json, "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson")
+		.defer(d3.json, "data/earthquake_data.json")
 		.awaitAll(function(error, results){
-			if (error) throw error;
-			drawGlobeData(results);
+			if (error) throw error;							
+			drawGlobeData([results[0], results[1]]);
 		})
 	}
 
 	function drawGlobeData(data){
-		console.log("drawing globe")
+		// console.log("drawing globe")
 
 	    var earthquakes = [];
 	    
@@ -37,7 +36,7 @@ app.main = (function() {
 	var source, question_template, definition_template, retm_template, news_template;
 
 	function initTemplates(){
-		console.log("initializing templates")
+		// console.log("initializing templates")
 
 		source = $("#question_template").html();
 		question_template = Handlebars.compile(source);
@@ -65,7 +64,7 @@ app.main = (function() {
 	}
 
 	function showTemplate(div, template, data){
-		console.log("showing template " + div);
+		// console.log("showing template " + div);
 		$(div).html(template(data));
 	}
 
@@ -79,12 +78,12 @@ app.main = (function() {
 	var ipcSetup = function(){
 
 		ipcRenderer.on('filter', (event, arg) => {
-			console.log(arg)
+			// console.log(arg)
 			filterData(arg.time, arg.size);
 		});
 
 		ipcRenderer.on('return-retm', (event, arg) => {
-			console.log(arg)
+			// console.log(arg)
 			retm_data = arg
 			addRETMtoGlobe(arg);
 			showTemplate("#retm_container", retm_template, {"retm": arg}); 
@@ -92,12 +91,16 @@ app.main = (function() {
 		})
 		
 		ipcRenderer.on('knob-status', (event, arg) => {
-			console.log("arduino connected: ", arg);
+			// console.log("arduino connected: ", arg);
 			if (arg) {
 				$('#filter_container').hide();				
 			} else {
 				setupFilters();
 			}
+		})
+
+		ipcRenderer.on('return-globe-data', (event, arg) => {
+			drawGlobeData(arg);
 		})
 	}
 
@@ -105,7 +108,7 @@ app.main = (function() {
 	
 
 	var checkInactivity = function(){
-		console.log("tracking inactivity")
+		// console.log("tracking inactivity")
 		var idleTime = 0;
 		var isInactive = false;
 		$(document).ready(function () {
@@ -146,12 +149,12 @@ app.main = (function() {
 
 	var attachEvents = function(){
 
-		console.log("attaching events")
+		// console.log("attaching events")
 
 		$('.locate').click( function(){
 			checkifthingsareopen(isVideoOpen, isNewsOpen);
 			var num = $(this).attr("data-id")
-			console.log("locate ", retm_data[num].short_region)
+			// console.log("locate ", retm_data[num].short_region)
 			rotateTo(retm_data[num].location.lat, retm_data[num].location.lng, 2)
 		})
 
@@ -285,10 +288,11 @@ app.main = (function() {
 
 
 	var init = function(){
-		console.log('Initializing app.');
+		// console.log('Initializing app.');
 		ipcSetup();
 		setupGlobe();
-		callGlobeData();
+		ipcRenderer.send('get-globe-data');
+		// callGlobeData();
 		attachEvents();
 		checkInactivity();
 

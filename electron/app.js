@@ -69,6 +69,67 @@ board.on('ready', function () {
   });
 })
 
+/*----------------------------------------  Globe Data */
+
+function checkHowManyBackups(folder) {
+  fs.readdir('public/data/'+folder, function (err, files) {         // reading back up file dir
+    if (err) {
+        throw err;
+    } 
+    files.sort();
+    files.reverse();
+    // console.log(files);
+    if (files.length > 5) {                                         // if there's more than 5, delete the oldest one
+      fs.unlink('public/data/'+folder+"/"+files[files.length-1], (err) => {
+        if (err) throw err;
+        // console.log('successfully deleted ', files[files.length-1]);
+      });
+    }
+  })
+}
+
+function checkGlobeData(data) {
+  var new_data = data[0].features;
+  var old_data = data[1].features;
+
+  if (new_data[0].id != old_data[0].id){                                // if the two most recent eqs in each file don't match
+    var eqs_string = JSON.stringify(old_data)
+    var currtime = Date.parse(new Date)
+    fs.writeFile('public/data/eq_data_backup/backup_'+ currtime +'.json', eqs_string, (err) => {    // back up the current data
+      if (err) throw err;
+      // console.log("successfully backed up old eqs")
+      checkHowManyBackups("eq_data_backup")
+    })
+    var new_eqs_string = JSON.stringify(new_data)
+    fs.writeFile('public/data/earthquake_data.json', eqs_string, (err) => {                 // save new current data
+      if (err) throw err;
+      // console.log("successfully cached new eqs")
+    })
+  } else {
+    // console.log("no new earthquakes")
+  }
+}
+
+function getGlobeData(){
+  fs.readFile('public/data/history.json', (err, history) => {
+    var hist = JSON.parse(history);
+    request({
+      url: "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson"      //find the info about the earthquake
+    }, function(error, response, body){
+      if (error) {
+        fs.readFile('public/data/earthquake_data.json', (err, eqs) => {
+          console.log("got error, using cached data")
+          mainWindow.webContents.send('return-globe-data', [hist, eqs])
+        })
+      } else {
+        var eqdata = JSON.parse(body)
+        mainWindow.webContents.send('return-globe-data', [eqdata, hist])
+        checkGlobeData([eqdata, hist])
+      }
+    }) 
+  })
+}
+
 /*----------------------------------------  RETM */
 
 function findLatLon(loc, callback){
@@ -103,9 +164,7 @@ function getRETMinfo(data) {
   }
 
   q.awaitAll(function(err, res) {
-    console.log("retm queue done");
-    // console.log("err ", err)
-    // console.log("res ", res)
+    // console.log("retm queue done");
 
     for (var i = 0; i < data.length; i++){
       data[i].location = res[i]
@@ -116,14 +175,14 @@ function getRETMinfo(data) {
     var retm_string = JSON.stringify(data)
     fs.writeFile('public/data/retm_data.json', retm_string, (err) => {
       if (err) throw err;
-      console.log("wrote retm to file")
+      // console.log("wrote retm to file")
     })
     mainWindow.webContents.send('return-retm', data)
   });
 }
 
 function checkIfNewRETMEntry(data){
-  console.log("checking if new retm stuff exists")
+  // console.log("checking if new retm stuff exists")
   var parse = data.substr(2, data.length-4);
   var retmdata = JSON.parse(parse)
   var retmlist = [];
@@ -146,13 +205,22 @@ function checkIfNewRETMEntry(data){
     var old_retm = JSON.parse(data);
 
     if(retmlist[0]['iris_dmc_event_id'] == old_retm[0]['iris_dmc_event_id']){
-      console.log("nope, use old info")
+      // console.log("no new retm")
       mainWindow.webContents.send('return-retm', old_retm)
     } else {
-      console.log("yes, get new info")
+      // console.log("yes, getting new retm info")
       getRETMinfo(retmlist)
     }
   });
+}
+
+
+function useCachedRETM(){
+  fs.readFile('public/data/retm_data.json', (err, data) => {
+    if (err) throw err;
+    var old_retm = JSON.parse(data);
+    mainWindow.webContents.send('return-retm', old_retm)
+  })
 }
 
 /*----------------------------------------  IPC LISTENERS */
@@ -161,12 +229,20 @@ ipcMain.on('get-retm', (event, arg) => {
   request({
     url: arg.url
   }, function(error, response, body){
-    checkIfNewRETMEntry(body)
+    if (error){
+      useCachedRETM();
+    } else {
+      checkIfNewRETMEntry(body)
+    }
   })
 })
 
 ipcMain.on('knob', (event, arg) =>{
   event.sender.send('knob-status', isConnected)
+})
+
+ipcMain.on('get-globe-data', (event, arg) => {
+  getGlobeData();
 })
 
 /*----------------------------------------  create window */
