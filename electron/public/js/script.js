@@ -8,24 +8,14 @@ app.main = (function() {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ queuing data calls
 
-	function useCachedEQs() {
-		d3.queue(1)
-		.defer(d3.json, "data/history.json")
-		.defer(d3.json, "data/earthquake_data.json")
-		.awaitAll(function(error, results){
-			if (error) throw error;							
-			drawGlobeData([results[0], results[1]]);
-		})
-	}
-
-	function drawGlobeData(data){
+	function drawGlobeData(data){		
 		// console.log("drawing globe")
-
-	    var earthquakes = [];
+		var earthquakes = [];
 	    
-	    for (var i = 0; i <data[0].features.length; i++){ earthquakes.push(data[0].features[i]) }		// UNCOMMENT FOR MAJOR LAG 
+	    for (var i = 0; i <data[0].features.length; i++){ earthquakes.push(data[0].features[i]) }
 	    for (var i = 0; i <data[1].features.length; i++){ earthquakes.push(data[1].features[i]) };
-		earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
+		// not sure if this step is necessary now that not using d3... but this sorts eqs by time before drawing them. 
+	    earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
 		
 		drawData(earthquakes);
 
