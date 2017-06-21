@@ -1,20 +1,14 @@
 {
-  "name": "electron-socket-test",
+  "name": "Earthquake Explorer",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Interactive earthquake map for AMNH Seismology Lab",
   "main": "app.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
+  "repository": "https://github.com/jcontour/amnh_earthquake",
+  "keywords": [],
+  "author": "Jessie Contour",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.6.2",
