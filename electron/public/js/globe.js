@@ -30,8 +30,6 @@ var setupGlobe = function(){
 
     scene = viewer.scene;
 
-
-
     scene.screenSpaceCameraController.minimumZoomDistance=3000000;
     scene.screenSpaceCameraController.maximumZoomDistance=100000000;
 
@@ -42,7 +40,7 @@ var setupGlobe = function(){
 
     var dblclick_handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     dblclick_handler.setInputAction(function(dblclick){
-        dblclicked = scene.pick(dblclick.position);
+        dblclicked = scene.pick(dblclick.position);             // get the entity and center the view on it
         if (dblclicked != undefined){
             // console.log(dblclicked)
             if (dblclicked['id']['_name']=="questionSpot"){
@@ -62,7 +60,7 @@ var setupGlobe = function(){
         var clicked = scene.pick(click.position);
         if (clicked != undefined){
             // console.log(clicked)
-            if (clicked['id']['_name']=="questionSpot"){
+            if (clicked['id']['_name']=="questionSpot"){            // if it's a question - open the question up
                 var whichQuestion = clicked['id']['_id']
                 // console.log(whichQuestion)
                 if ($('#'+ whichQuestion).children("i").hasClass("up")) {
@@ -70,7 +68,7 @@ var setupGlobe = function(){
                         $(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
                     })
                     $('#'+ whichQuestion).children("i").removeClass("up").addClass("down").siblings('p').slideDown();
-                } else {
+                } else {                                            // if it's open already, center the view on it
                     var loc = clicked["primitive"]["_position"]
                     centerClicked(loc);
                 }
@@ -87,7 +85,7 @@ var setupGlobe = function(){
                 prevPickedObject = pickedObject
                 pickedObject = currPickedObject
                 
-                if (prevPickedObject !== pickedObject && prevPickedObject !== undefined ){
+                if (prevPickedObject !== pickedObject && prevPickedObject !== undefined ){      // if current thing is a thing un-highlight previous thing if it was a thing
                     if (prevPickedObject["id"]["_name"] == "questionSpot"){
                         highlightPoint("question", prevPickedObject, false)
                     } else if(prevPickedObject["id"]["_name"] == "retm"){
@@ -97,7 +95,7 @@ var setupGlobe = function(){
                     }
                 }
 
-                if (pickedObject["id"]["_name"] == "questionSpot"){
+                if (pickedObject["id"]["_name"] == "questionSpot"){                             // highlight current thing 
                     highlightPoint("question", pickedObject, true)
                 } else if (pickedObject["id"]["_name"] == "retm"){
                     highlightPoint("retm", pickedObject, true)
@@ -105,7 +103,7 @@ var setupGlobe = function(){
                     highlightPoint("eq", pickedObject, true)
                 }
             }
-        } else if (currPickedObject == undefined || currPickedObject["id"] !== undefined){
+        } else if (currPickedObject == undefined || currPickedObject["id"] !== undefined){      // if current thing isn't a thing, unhighlight the previous thing
             if (pickedObject !== undefined ){
                 if (pickedObject["id"]["_name"] == "questionSpot"){                     
                     highlightPoint("question", pickedObject, false)
@@ -163,16 +161,13 @@ var drawData = function(earthquakes){
     // console.log("drawing earthquakes")
 
     for (var i = 0; i < earthquakes.length; i++) {
-    // for (var i = earthquakes.length - 1; i > earthquakes.length - 101; i--) {
-    // for (var i = 0; i < 100; i++) {
         var lat = earthquakes[i].geometry.coordinates[0];
         var lon = earthquakes[i].geometry.coordinates[1];
         var mag = earthquakes[i].properties.mag;
         var name = earthquakes[i].properties.place;
         var date = new Date(earthquakes[i].properties.time);
 
-        viewer.entities.add({
-            // name : mag,
+        viewer.entities.add({                                       // add a circle at the earthquake location
             description : eq_time(date)+" "+mag,
             label : {
                         text : earthquakes[i].properties.title,
@@ -192,8 +187,7 @@ var drawData = function(earthquakes){
     }
 }
 
-var addQuestions = function(data){
-    // console.log("adding question areas")
+var addQuestions = function(data){                                  // add question icon to locations of question spots
     for (var i = 0; i < data.length; i++){
         viewer.entities.add({
             position : Cesium.Cartesian3.fromDegrees(data[i]["coordinates"][1], data[i]["coordinates"][0], 200000),
@@ -208,7 +202,7 @@ var addQuestions = function(data){
     }
 }
 
-var addRETMtoGlobe = function(data){
+var addRETMtoGlobe = function(data){                                // add big purple dots for retm
     // console.log(data)
     for (var i = 0; i < data.length; i++){
         viewer.entities.add({
@@ -231,7 +225,7 @@ var addRETMtoGlobe = function(data){
 var currPickedObject, pickedObject, prevPickedObject = undefined;
 var dblclicked = undefined;
 
-var highlightPoint = function(type, object, isHighlighted){
+var highlightPoint = function(type, object, isHighlighted){                 // how to highlight various things and their corresponding html elements
     if (type == "eq"){
         var desc = object["id"]["_description"]["_value"]                 // check if it's a historical eq
         var split = desc.split(" ")
@@ -269,7 +263,7 @@ var highlightPoint = function(type, object, isHighlighted){
     }
 }
 
-var centerClicked = function(obj){
+var centerClicked = function(obj){          // convert x/y/z of entity location to cartesian coordinates
     var x = obj.x;
     var y = obj.y;
     var z = obj.z;
@@ -282,13 +276,13 @@ var centerClicked = function(obj){
     rotateTo(lat, lon, 3)
 }
 
-var spinGlobe = function(angle) {
+var spinGlobe = function(angle) {           // rotate around during idle
     viewer.camera.rotateLeft(angle);
 }
 
 var rotateTo = function(lat, lon, focus){               // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rotate globe to location
     var height
-    if (focus == 1){
+    if (focus == 1){                                // setting distance away depending on what's happening
         height = 10000000; 
     } else if (focus == 2) {
         height = 8000000

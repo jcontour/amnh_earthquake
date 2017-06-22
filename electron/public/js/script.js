@@ -12,7 +12,7 @@ app.main = (function() {
 		// console.log("drawing globe")
 		var earthquakes = [];
 	    
-	    for (var i = 0; i <data[0].features.length; i++){ earthquakes.push(data[0].features[i]) }
+	    for (var i = 0; i <data[0].features.length; i++){ earthquakes.push(data[0].features[i]) }		// put all eqs into one array for drawing
 	    for (var i = 0; i <data[1].features.length; i++){ earthquakes.push(data[1].features[i]) };
 		// not sure if this step is necessary now that not using d3... but this sorts eqs by time before drawing them. 
 	    earthquakes.sort( function(a, b) {  return d3.ascending(a.properties.time, b.properties.time) });
@@ -40,9 +40,6 @@ app.main = (function() {
 		source = $("#news_template").html();
 		news_template = Handlebars.compile(source);
 
-		// calling data for the templates
-		ipcRenderer.send("get-retm", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
-
 		d3.json("data/defs_and_questions.json", function(err, res){
 				var questions = res["questions"]
 				addQuestions(questions);
@@ -62,13 +59,11 @@ app.main = (function() {
 
 	var retm_data = [];
 
-
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IPC COMMUNICATION STUFF
 
 	var ipcSetup = function(){
 
 		ipcRenderer.on('filter', (event, arg) => {
-			// console.log(arg)
 			filterData(arg.time, arg.size);
 		});
 
@@ -98,7 +93,6 @@ app.main = (function() {
 	
 
 	var checkInactivity = function(){
-		// console.log("tracking inactivity")
 		var idleTime = 0;
 		var isInactive = false;
 		$(document).ready(function () {
@@ -139,17 +133,13 @@ app.main = (function() {
 
 	var attachEvents = function(){
 
-		// console.log("attaching events")
-
 		$('.locate').click( function(){
 			checkifthingsareopen(isVideoOpen, isNewsOpen);
 			var num = $(this).attr("data-id")
-			// console.log("locate ", retm_data[num].short_region)
 			rotateTo(retm_data[num].location.lat, retm_data[num].location.lng, 2)
 		})
 
 		$('.q-entry').click(function(){
-			// console.log("clicked q")
 			checkifthingsareopen(isVideoOpen, isNewsOpen);
 			if ($(this).children("i").hasClass("up")) {
 				
@@ -170,7 +160,6 @@ app.main = (function() {
 		})
 
 		$('.d-entry').click(function(){
-			// console.log("clicked d")
 			if ($(this).children("i").hasClass("up")) {
 
 				$('.d-entry').each(function(){
@@ -264,27 +253,22 @@ app.main = (function() {
 			var sizeval = this.value;
 			filterData(timeval, sizeval);
 		})
-		
-		// initMouseInteraction();
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 
 
 	var setupFilters = function(){
-		document.getElementById("nTime").value = "0";
+		document.getElementById("nTime").value = "0";	//if there's no arduino, set the filters to min values
 		document.getElementById("nSize").value = "0";
 	}
 
-
-
 	var init = function(){
-		// console.log('Initializing app.');
-		ipcSetup();
-		setupGlobe();
+		ipcSetup();	// setup communication
+		setupGlobe();  // setup globe
 		ipcRenderer.send('get-globe-data');
-		// callGlobeData();
-		attachEvents();
-		checkInactivity();
+		ipcRenderer.send("get-retm", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
+		attachEvents();	// setup interaction
+		checkInactivity(); 
 
 		setTimeout(function(){
 		  ipcRenderer.send('knob', 'test');

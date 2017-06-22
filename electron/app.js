@@ -50,9 +50,8 @@ board.on('ready', function () {
 
   time_pot.on("data", function() {
     curr_time_val = Math.floor(remap_vals(this.value, 0, 1023, 6, 1))
-    if (time_pot_val !== curr_time_val){
+    if (time_pot_val !== curr_time_val){      // if value has changed, send it to the front for filtering
       time_pot_val = curr_time_val;
-      // console.log( {time: time_pot_val, size: size_pot_val} );
       var pot_data = {time: time_pot_val, size: size_pot_val}
       mainWindow.webContents.send('filter', pot_data );
     }
@@ -60,9 +59,8 @@ board.on('ready', function () {
 
   size_pot.on("data", function() {
     curr_size_val = Math.floor(remap_vals(this.value, 0, 1023, 6, 1))
-    if (size_pot_val !== curr_size_val){
+    if (size_pot_val !== curr_size_val){    // if value has changed, send it to the front for filtering
       size_pot_val = curr_size_val;
-      // console.log( {time: time_pot_val, size: size_pot_val} );
       var pot_data = {time: time_pot_val, size: size_pot_val}
       mainWindow.webContents.send('filter', pot_data );
     }
@@ -78,7 +76,6 @@ function checkHowManyBackups(folder) {
     } 
     files.sort();
     files.reverse();
-    // console.log(files);
     if (files.length > 5) {                                         // if there's more than 5, delete the oldest one
       fs.unlink('public/data/'+folder+"/"+files[files.length-1], (err) => {
         if (err) throw err;
@@ -111,18 +108,18 @@ function checkGlobeData(data) {
 }
 
 function getGlobeData(){
-  fs.readFile('public/data/history.json', (err, history) => {
+  fs.readFile('public/data/history.json', (err, history) => {   // get history data first
     var hist = JSON.parse(history);
     request({
       url: "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson"      //find the info about the earthquake
     }, function(error, response, body){
-      if (error) {
+      if (error) {                                                                            // if there's an error, use the saved data
         fs.readFile('public/data/earthquake_data.json', (err, eqs) => {
           // console.log("got error, using cached data")
           mainWindow.webContents.send('return-globe-data', [hist, eqs])
         })
       } else {
-        var eqdata = JSON.parse(body)
+        var eqdata = JSON.parse(body)                                                         // otherwise, use the new data and then cache it
         mainWindow.webContents.send('return-globe-data', [eqdata, hist])
         checkGlobeData([eqdata, hist])
       }
@@ -132,7 +129,7 @@ function getGlobeData(){
 
 /*----------------------------------------  RETM */
 
-function findLatLon(loc, callback){
+function findLatLon(loc, callback){             // get location data of place from google
  d3.json("http://maps.googleapis.com/maps/api/geocode/json?address=" + loc + "&sensor=true", 
   function(err, res){
      callback(err, res['results'][0]['geometry']['location'] )
@@ -181,8 +178,8 @@ function getRETMinfo(data) {
   });
 }
 
-function checkIfNewRETMEntry(data){
-  // console.log("checking if new retm stuff exists")
+function checkIfNewRETMEntry(data){       // checking most recent entries against each other to see if it's been updated
+
   var parse = data.substr(2, data.length-4);
   var retmdata = JSON.parse(parse)
   var retmlist = [];
@@ -257,12 +254,11 @@ function createWindow () {
     slashes: true
   }))
 
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
     mainWindow = null
   })
-
 }
 
 app.on('ready', createWindow)
