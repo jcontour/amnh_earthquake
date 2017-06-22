@@ -283,7 +283,7 @@ var spinGlobe = function(angle) {           // rotate around during idle
 var rotateTo = function(lat, lon, focus){               // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rotate globe to location
     var height
     if (focus == 1){                                // setting distance away depending on what's happening
-        height = 10000000; 
+        height = 15000000; 
     } else if (focus == 2) {
         height = 8000000
     } else {

@@ -40,6 +40,8 @@ app.main = (function() {
 		source = $("#news_template").html();
 		news_template = Handlebars.compile(source);
 
+		ipcRenderer.send("get-retm", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
+
 		d3.json("data/defs_and_questions.json", function(err, res){
 				var questions = res["questions"]
 				addQuestions(questions);
@@ -52,6 +54,7 @@ app.main = (function() {
 
 	function showTemplate(div, template, data){
 		// console.log("showing template " + div);
+		console.log(data)
 		$(div).html(template(data));
 	}
 
@@ -69,11 +72,11 @@ app.main = (function() {
 
 		ipcRenderer.on('return-retm', (event, arg) => {
 			// console.log(arg)
-			retm_data = arg
+			retm_data = arg;
 			addRETMtoGlobe(arg);
 			showTemplate("#retm_container", retm_template, {"retm": arg}); 
 			attachEvents();
-		})
+		});
 		
 		ipcRenderer.on('knob-status', (event, arg) => {
 			// console.log("arduino connected: ", arg);
@@ -266,7 +269,6 @@ app.main = (function() {
 		ipcSetup();	// setup communication
 		setupGlobe();  // setup globe
 		ipcRenderer.send('get-globe-data');
-		ipcRenderer.send("get-retm", {url:"http://www.iris.edu/hq/api/json-dmc-evid-retm?callback=a", which: "retm"})
 		attachEvents();	// setup interaction
 		checkInactivity(); 
 
