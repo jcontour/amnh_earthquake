@@ -7,42 +7,6 @@ var thismonth = today - (1000*60*60*24*14)
 var thisyear = today - (1000*60*60*24*21)
 var historical = today - (1000*60*60*24*30)
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ REMAPPING VALUES
-
-var eq_opacity = "1"
-
-var eq_color = function(time) {  // mapping color to time of eq
-    if ( time > historical ){
-        var color = d3.scaleLinear()
-        .domain([today,thisyear])
-        // .range(["#FF0000","#FFFF50"])
-        .range(["#A52710","#FFD13F"])
-        .clamp(true);
-        return color(time)
-    } else { return '#000000' }         // color for "history" earthquakes
-}
-
-var eq_time = function(time) {  // mapping time to filter values
-    if ( time > historical ){
-        var color = d3.scaleLinear()
-        .domain([today,thisyear])
-        .range([1,6])
-        .clamp(true);
-        return Math.floor(color(time))
-    } else { return 0 }         // color for "history" earthquakes
-}
-
-var eq_size = function(date, mag){
-    var size = d3.scalePow().exponent(3)
-        .domain([1, 7])
-        .range([7, 50])
-        .clamp(true);
-
-    if (date > historical){
-        return size(mag);
-    } else { return 3; }
-}
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SETUP CESIUM
 
 var setupGlobe = function(){
@@ -65,6 +29,132 @@ var setupGlobe = function(){
     });
 
     scene = viewer.scene;
+
+
+
+    scene.screenSpaceCameraController.minimumZoomDistance=3000000;
+    scene.screenSpaceCameraController.maximumZoomDistance=100000000;
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ overwriting default mouse actions
+
+    // DOUBLE CLICK ACTION
+    viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);       
+
+    var dblclick_handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    dblclick_handler.setInputAction(function(dblclick){
+        dblclicked = scene.pick(dblclick.position);
+        if (dblclicked != undefined){
+            // console.log(dblclicked)
+            if (dblclicked['id']['_name']=="questionSpot"){
+                var whichQuestion = dblclicked['id']['_id']
+                // console.log(whichQuestion)
+                $('#'+ whichQuestion).click()
+            } else {
+                var loc = dblclicked["primitive"]["_position"]
+                centerClicked(loc);
+            }
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK)
+
+    // CLICK ACTION
+    var click_handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    click_handler.setInputAction(function(click){
+        var clicked = scene.pick(click.position);
+        if (clicked != undefined){
+            // console.log(clicked)
+            if (clicked['id']['_name']=="questionSpot"){
+                var whichQuestion = clicked['id']['_id']
+                // console.log(whichQuestion)
+                if ($('#'+ whichQuestion).children("i").hasClass("up")) {
+                    $('.q-entry').each(function(){
+                        $(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
+                    })
+                    $('#'+ whichQuestion).children("i").removeClass("up").addClass("down").siblings('p').slideDown();
+                } else {
+                    var loc = clicked["primitive"]["_position"]
+                    centerClicked(loc);
+                }
+            }
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+
+    // HOVER ACTION
+    var move_handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+    move_handler.setInputAction(function(movement) {
+        currPickedObject = scene.pick(movement.endPosition);
+        if (currPickedObject !== undefined && currPickedObject["id"] !== undefined){
+            if (pickedObject !== currPickedObject){
+                prevPickedObject = pickedObject
+                pickedObject = currPickedObject
+                
+                if (prevPickedObject !== pickedObject && prevPickedObject !== undefined ){
+                    if (prevPickedObject["id"]["_name"] == "questionSpot"){
+                        highlightPoint("question", prevPickedObject, false)
+                    } else if(prevPickedObject["id"]["_name"] == "retm"){
+                        highlightPoint("retm", prevPickedObject, false)
+                    } else {
+                        highlightPoint("eq", prevPickedObject, false)
+                    }
+                }
+
+                if (pickedObject["id"]["_name"] == "questionSpot"){
+                    highlightPoint("question", pickedObject, true)
+                } else if (pickedObject["id"]["_name"] == "retm"){
+                    highlightPoint("retm", pickedObject, true)
+                } else {
+                    highlightPoint("eq", pickedObject, true)
+                }
+            }
+        } else if (currPickedObject == undefined || currPickedObject["id"] !== undefined){
+            if (pickedObject !== undefined ){
+                if (pickedObject["id"]["_name"] == "questionSpot"){                     
+                    highlightPoint("question", pickedObject, false)
+                } else if (pickedObject["id"]["_name"] == "retm"){
+                    highlightPoint("retm", pickedObject, false)
+                } else {
+                    highlightPoint("eq", pickedObject, false)
+                }
+                pickedObject = undefined
+            }
+        }
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ REMAPPING VALUES
+
+var eq_opacity = "1"
+
+var eq_color = function(time) {  // mapping color to time of eq
+    if ( time > historical ){
+        var color = d3.scaleLinear()
+        .domain([today,thisyear])
+        // .range(["#FF0000","#FFFF50"])
+        .range(["#A52710","#FFD13F"])
+        .clamp(true);
+        return color(time)
+    } else { return '#7F1200' }         // color for "history" earthquakes
+}
+
+var eq_time = function(time) {  // mapping time to filter values
+    if ( time > historical ){
+        var color = d3.scaleLinear()
+        .domain([today,thisyear])
+        .range([1,6])
+        .clamp(true);
+        return Math.floor(color(time))
+    } else { return 0 }         // time for "history" earthquakes
+}
+
+var eq_size = function(date, mag){
+    var size = d3.scalePow().exponent(3)
+        .domain([1, 7])
+        .range([7, 50])
+        .clamp(true);
+
+    if (date > historical){
+        return size(mag);
+    } else { return 3; }
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DRAWING ALL ENTITIES ON GLOBE
@@ -139,6 +229,7 @@ var addRETMtoGlobe = function(data){
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MOUSEOVER
 var currPickedObject, pickedObject, prevPickedObject = undefined;
+var dblclicked = undefined;
 
 var highlightPoint = function(type, object, isHighlighted){
     if (type == "eq"){
@@ -178,57 +269,36 @@ var highlightPoint = function(type, object, isHighlighted){
     }
 }
 
-var initMouseoverInteraction = function(){
+var centerClicked = function(obj){
+    var x = obj.x;
+    var y = obj.y;
+    var z = obj.z;
 
-    var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
-    handler.setInputAction(function(movement) {
-        currPickedObject = scene.pick(movement.endPosition);
-        if (currPickedObject !== undefined && currPickedObject["id"] !== undefined){
-            if (pickedObject !== currPickedObject){
-                prevPickedObject = pickedObject
-                pickedObject = currPickedObject
-                
-                if (prevPickedObject !== pickedObject && prevPickedObject !== undefined ){
-                    if (prevPickedObject["id"]["_name"] == "questionSpot"){
-                        highlightPoint("question", prevPickedObject, false)
-                    } else if(prevPickedObject["id"]["_name"] == "retm"){
-                        highlightPoint("retm", prevPickedObject, false)
-                    } else {
-                        highlightPoint("eq", prevPickedObject, false)
-                    }
-                }
+    var loc = Cesium.Cartesian3.fromArray([x,y,z])
+    var carto  = Cesium.Ellipsoid.WGS84.cartesianToCartographic(loc);     
+    var lon = Cesium.Math.toDegrees(carto.longitude); 
+    var lat = Cesium.Math.toDegrees(carto.latitude); 
 
-                if (pickedObject["id"]["_name"] == "questionSpot"){
-                    highlightPoint("question", pickedObject, true)
-                } else if (pickedObject["id"]["_name"] == "retm"){
-                    highlightPoint("retm", pickedObject, true)
-                } else {
-                    highlightPoint("eq", pickedObject, true)
-                }
-            }
-        } else if (currPickedObject == undefined || currPickedObject["id"] !== undefined){
-            if (pickedObject !== undefined ){
-                if (pickedObject["id"]["_name"] == "questionSpot"){                     
-                    highlightPoint("question", pickedObject, false)
-                } else if (pickedObject["id"]["_name"] == "retm"){
-                    highlightPoint("retm", pickedObject, false)
-                } else {
-                    highlightPoint("eq", pickedObject, false)
-                }
-                pickedObject = undefined
-            }
-        }
-    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    rotateTo(lat, lon, 3)
 }
 
 var spinGlobe = function(angle) {
-    viewer.camera.rotateRight(angle);
+    viewer.camera.rotateLeft(angle);
 }
 
-var rotateTo = function(lat, lon, time){               // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rotate globe to location
+var rotateTo = function(lat, lon, focus){               // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ rotate globe to location
+    var height
+    if (focus == 1){
+        height = 10000000; 
+    } else if (focus == 2) {
+        height = 8000000
+    } else {
+        height = 4000000
+    }
+
     viewer.camera.flyTo({
-        destination : Cesium.Cartesian3.fromDegrees(lon, lat, 15000000),
-        duration: time
+        destination : Cesium.Cartesian3.fromDegrees(lon, lat, height),
+        duration: 1.5
     });
 }
 

@@ -34,12 +34,12 @@ board.on('ready', function () {
   console.log("board connected!")
 
   size_pot = new five.Sensor({
-      pin: "A0",
+      pin: "A1",
       freq: 250
   });
 
   time_pot = new five.Sensor({
-      pin: "A1",
+      pin: "A0",
       freq: 250
   });
 
@@ -49,20 +49,20 @@ board.on('ready', function () {
   });
 
   time_pot.on("data", function() {
-    curr_time_val = Math.floor(remap_vals(this.value, 0, 1023, 1, 6))
+    curr_time_val = Math.floor(remap_vals(this.value, 0, 1023, 6, 1))
     if (time_pot_val !== curr_time_val){
       time_pot_val = curr_time_val;
-      console.log( {time: time_pot_val, size: size_pot_val} );
+      // console.log( {time: time_pot_val, size: size_pot_val} );
       var pot_data = {time: time_pot_val, size: size_pot_val}
       mainWindow.webContents.send('filter', pot_data );
     }
   });
 
   size_pot.on("data", function() {
-    curr_size_val = Math.floor(remap_vals(this.value, 0, 1023, 1, 6))
+    curr_size_val = Math.floor(remap_vals(this.value, 0, 1023, 6, 1))
     if (size_pot_val !== curr_size_val){
       size_pot_val = curr_size_val;
-      console.log( {time: time_pot_val, size: size_pot_val} );
+      // console.log( {time: time_pot_val, size: size_pot_val} );
       var pot_data = {time: time_pot_val, size: size_pot_val}
       mainWindow.webContents.send('filter', pot_data );
     }
@@ -118,7 +118,7 @@ function getGlobeData(){
     }, function(error, response, body){
       if (error) {
         fs.readFile('public/data/earthquake_data.json', (err, eqs) => {
-          console.log("got error, using cached data")
+          // console.log("got error, using cached data")
           mainWindow.webContents.send('return-globe-data', [hist, eqs])
         })
       } else {
@@ -257,7 +257,7 @@ function createWindow () {
     slashes: true
   }))
 
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
     mainWindow = null

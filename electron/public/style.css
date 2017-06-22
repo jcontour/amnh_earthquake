@@ -4,6 +4,7 @@ body {
   background-color: #000E1D;
   font-family: sans-serif;
   color: white;
+  user-select: none;
 }
 
 #cesiumContainer {
@@ -88,6 +89,7 @@ hr{
 	position: absolute;
 	bottom: 50px;
 	left: calc(50vw - 250px);
+	z-index: 50;
 }
 
 #key-color {
@@ -286,6 +288,7 @@ input[type=range]::-webkit-slider-thumb {
 	padding: 2px 4px;
 	border: 2px solid white;
 	background-color: rgba(0,0,0,0.5);
+	z-index: 100;
 }
 
 #close-usarray{

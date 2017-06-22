@@ -110,12 +110,12 @@ app.main = (function() {
 		});
 
 		function timerIncrement() {
-			var delay = 1200	// delay = 2 min
+			var delay = 300	// delay = 2 min
 		    idleTime = idleTime + 1;
 		    if (idleTime > delay) {
 		        isInactive = true;
 		        if(isInactive && idleTime < delay + 20) {
-		        	rotateTo(11.241288, -76.651682, 2)
+		        	rotateTo(11.241288, -76.651682, 1)
 		        } else {
 		        	spinGlobe(0.005)
 		        }
@@ -215,7 +215,7 @@ app.main = (function() {
 			  	$('#usarray-view').slideUp();
 			  	isVideoOpen = false;
 			  }
-			}, 180000);
+			}, 100000);
 
 		})
 
@@ -245,7 +245,7 @@ app.main = (function() {
 					})
 					isNewsOpen = false;
 				}
-			}, 180000);
+			}, 60000);
 		})
 
 		$('.close-view-news').click(function(){
@@ -265,7 +265,7 @@ app.main = (function() {
 			filterData(timeval, sizeval);
 		})
 		
-		initMouseoverInteraction();
+		// initMouseInteraction();
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 
