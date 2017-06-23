@@ -9,6 +9,9 @@ var historical = today - (1000*60*60*24*30)
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SETUP CESIUM
 
+var currPickedObject, pickedObject, prevPickedObject = undefined;
+var dblclicked = undefined;
+
 var setupGlobe = function(){
     // console.log("setting up globe")
     //new Cesium object, displays planet, generic zoom/display level
@@ -59,7 +62,7 @@ var setupGlobe = function(){
     click_handler.setInputAction(function(click){
         var clicked = scene.pick(click.position);
         if (clicked != undefined){
-            // console.log(clicked)
+            // console.log(clicked["id"]["_description"]["_value"])
             if (clicked['id']['_name']=="questionSpot"){            // if it's a question - open the question up
                 var whichQuestion = clicked['id']['_id']
                 // console.log(whichQuestion)
@@ -68,18 +71,28 @@ var setupGlobe = function(){
                         $(this).children("i").removeClass("down").addClass("up").siblings('p').slideUp();
                     })
                     $('#'+ whichQuestion).children("i").removeClass("up").addClass("down").siblings('p').slideDown();
+                    var loc = clicked["primitive"]["_position"]
+                    centerClicked(loc);
                 } else {                                            // if it's open already, center the view on it
                     var loc = clicked["primitive"]["_position"]
                     centerClicked(loc);
                 }
+            } else if (clicked['id']['_name'] == "earthquake"){
+                var desc = clicked["id"]["_label"]["_text"]["_value"]
+                showEQDesc(desc);
+            } else if (clicked['id']['_name'] == "retm") {
+                var id = clicked["id"]["_id"]
+                var eqid = clicked["id"]["_description"]["_value"]
+                showRETMView(id, eqid);
             }
         }
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     // HOVER ACTION
     var move_handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     move_handler.setInputAction(function(movement) {
         currPickedObject = scene.pick(movement.endPosition);
+
         if (currPickedObject !== undefined && currPickedObject["id"] !== undefined){
             if (pickedObject !== currPickedObject){
                 prevPickedObject = pickedObject
@@ -170,7 +183,7 @@ var drawData = function(earthquakes){
         viewer.entities.add({                                       // add a circle at the earthquake location
             description : eq_time(date)+" "+mag,
             label : {
-                        text : earthquakes[i].properties.title,
+                        text : date+"|"+earthquakes[i].properties.title,
                         show : false,
                         scale : 0.5,
                         horizontalOrigin : Cesium.HorizontalOrigin.LEFT,
@@ -182,7 +195,8 @@ var drawData = function(earthquakes){
                 pixelSize : eq_size(date, mag),
                 color : Cesium.Color.fromCssColorString(eq_color(date)),
                 outlineWidth: eq_time(date)/4
-            }
+            },
+            name: "earthquake"
         });
     }
 }
@@ -221,9 +235,58 @@ var addRETMtoGlobe = function(data){                                // add big p
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INTERACTION
 
+var isRetmOpen = false;
+var showRETMView = function(id, eqid){
+
+    var info = $('#'+id).attr("data-earthquake")
+    $('#retm-info').text(info);
+    $('#retm-waveform').attr("src", "data/" + eqid + "_waveform.png");
+
+    if(isDescOpen){
+        $('#eq-desc').slideUp()
+        isDescOpen = false;
+    }
+
+    if(!isRetmOpen){
+        $('#retm-view').slideDown()
+        isRetmOpen = true;
+    }
+
+    setTimeout(function(){
+        if(isRetmOpen) {
+            $('#retm-view').slideUp();
+            isRetmOpen = false;
+        }
+    }, 5000);
+}
+
+var isDescOpen = false;
+
+var showEQDesc = function(value){
+    var text = value.split("|")
+    var date = text[0].split(" ")
+
+    $('#eq-desc').html('<p>'+date[0]+" "+date[1]+" "+date[3]+" "+date[4]+'</p><p>'+text[1]+'</p>')
+
+
+    if(isRetmOpen) {
+        $('#retm-view').slideUp();
+        isRetmOpen = false;
+    }
+
+    if (!isDescOpen){
+        $('#eq-desc').slideDown()
+        isDescOpen = true;
+    }
+    setTimeout(function(){
+      if (isDescOpen){
+        $('#eq-desc').slideUp()
+        isDescOpen = false;
+      }
+    }, 5000);
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MOUSEOVER
-var currPickedObject, pickedObject, prevPickedObject = undefined;
-var dblclicked = undefined;
 
 var highlightPoint = function(type, object, isHighlighted){                 // how to highlight various things and their corresponding html elements
     if (type == "eq"){
@@ -231,9 +294,14 @@ var highlightPoint = function(type, object, isHighlighted){                 // h
         var split = desc.split(" ")
         if (split[0] != 0){
             if (isHighlighted){
-                object["id"]["_label"]["_show"]["_value"] = true;
+                // console.log(object['primitive'])
+                // object.entity.point.color = Cesium.Color.WHITE;
+                // object["primitive"]["_color"]["blue"] = 1
+                // object["primitive"]["_color"]["green"] = 1
+                // object["primitive"]["_color"]["red"] = 1
+                // object["primitive"]["_color"]["_show"]["_value"] = true;
             } else {
-                object["id"]["_label"]["_show"]["_value"] = false;
+                // object["id"]["_label"]["_show"]["_value"] = false;
             }
         }
     } else if (type == "question"){
@@ -246,19 +314,24 @@ var highlightPoint = function(type, object, isHighlighted){                 // h
             $('#'+id).children("i").css("border", "solid white").css("border-width", "0 3px 3px 0")
         }
     } else {            // retm
-        var id = object["id"]["_id"]
-        var eqid = object["id"]["_description"]["_value"]
+        // var id = object["id"]["_id"]
+        // var eqid = object["id"]["_description"]["_value"]
 
         if (isHighlighted){
             $('#'+id).addClass("highlighted")
-            var info = $('#'+id).attr("data-earthquake")
-            // console.log(info)
-            $('#retm-info').text(info);
-            $('#retm-waveform').attr("src", "data/" + eqid + "_waveform.png");
-            $('#retm-view').slideDown();
+            // var info = $('#'+id).attr("data-earthquake")
+            // // console.log(info)
+            // $('#retm-info').text(info);
+            // $('#retm-waveform').attr("src", "data/" + eqid + "_waveform.png");
+            // if(isDescOpen){
+            //     $('#eq-desc').slideUp()
+            //     isDescOpen = false;
+            // }
+            // $('#retm-view').slideDown();
+
         } else {
             $('#'+id).removeClass("highlighted")
-            $('#retm-view').slideUp();
+            // $('#retm-view').slideUp();
         }
     }
 }
@@ -297,6 +370,8 @@ var rotateTo = function(lat, lon, focus){               // ~~~~~~~~~~~~~~~~~~~~~
 }
 
 var filterData = function(timeval, sizeval){        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ filter with knob/slider
+    // console.log(timeval, sizeval)
+
     for (var i = 0; i < viewer.entities.values.length; i ++){
         var val = viewer.entities.values[i].description["_value"]
         var vals = val.split(" ")       // [time, size]

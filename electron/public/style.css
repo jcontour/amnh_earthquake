@@ -65,6 +65,7 @@ h3{
 	margin: 0;
 	padding: 0 5px; 
 	display: inline-block;
+	position: relative;
 }
 
 p{
@@ -80,6 +81,30 @@ hr{
 
 #logo {
 	margin: 20px 0px;	
+}
+
+#eq-desc {
+	width: 500px;
+	position: absolute;
+	top: 200px;
+	font-size: 1em;
+	text-align: center;
+	background-color: rgba(0,0,0,0.5);
+	padding: 5px;
+	border: 2px solid white;
+	color: white;
+	display: none;
+	left: calc(50vw - 255px);
+	z-index: 40;
+}
+
+#eq-desc p {
+	margin: 2px 0px;
+}
+
+.q-icon{
+	position: absolute;
+	right: 22px;
 }
 
 /* ------------ KEY STYLING ------------ */
@@ -219,7 +244,7 @@ input[type=range]::-webkit-slider-thumb {
 	display: inline-block;
 	position: absolute;
 	right: 24px;
-	background-color: rgba(0,0,0,0.1);
+	background-color: rgba(165,39,255,0.5);
 	color: white;
 	border: 2px solid white;
 	font-size: 0.8em;
@@ -229,8 +254,8 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 .locate:hover {
-	background-color: white;
-	color: black;
+	background-color: #A527FF;
+	border: 2px solid white;
 }
 
 .retm_wrapper img {
@@ -240,14 +265,16 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 #retm-view{
-	position: absolute;
-	right: 103%;
-	bottom: -2px;
+	position: fixed;
+	right: calc(50vw - 213px);
+	top: 150px;
+	text-align: center;
 	display: none;
 	background-color: rgba(0,0,0,0.5);
 	border: 2px solid white;
 	padding: 5px 8px;
 	width: 410px;
+	z-index: 45;
 }
 
 #retm-info {
@@ -291,6 +318,10 @@ input[type=range]::-webkit-slider-thumb {
 	z-index: 100;
 }
 
+video::-webkit-media-controls-fullscreen-button {
+    display: none;
+}
+
 #close-usarray{
 	position: absolute;
 	right: -38px;
@@ -323,6 +354,7 @@ input[type=range]::-webkit-slider-thumb {
 	width: 600px;
 	height: 800px;
 	display: none;
+	z-index: 95;
 }
 
 .view-news-container {

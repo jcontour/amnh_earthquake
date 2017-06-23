@@ -54,7 +54,6 @@ app.main = (function() {
 
 	function showTemplate(div, template, data){
 		// console.log("showing template " + div);
-		console.log(data)
 		$(div).html(template(data));
 	}
 
