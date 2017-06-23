@@ -180,6 +180,10 @@ var drawData = function(earthquakes){
         var name = earthquakes[i].properties.place;
         var date = new Date(earthquakes[i].properties.time);
 
+        if (mag < 2){
+            continue;
+        }
+
         viewer.entities.add({                                       // add a circle at the earthquake location
             description : eq_time(date)+" "+mag,
             label : {
