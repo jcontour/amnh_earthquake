@@ -265,8 +265,9 @@ var isDescOpen = false;
 var showEQDesc = function(value){
     var text = value.split("|")
     var date = text[0].split(" ")
+    console.log(text)
 
-    $('#eq-desc').html('<p>'+date[0]+" "+date[1]+" "+date[3]+" "+date[4]+'</p><p>'+text[1]+'</p>')
+    $('#eq-desc').html('<p>'+date[0]+" "+date[1]+" "+date[2]+" "+date[3]+" "+date[4]+'</p><p>'+text[1]+'</p>')
 
 
     if(isRetmOpen) {

@@ -58,7 +58,7 @@ board.on('ready', function () {
   });
 
   size_pot.on("data", function() {
-    curr_size_val = Math.floor(remap_vals(this.value, 0, 1023, 6, 1))
+    curr_size_val = Math.floor(remap_vals(this.value, 0, 1016, 6, 2))
     if (size_pot_val !== curr_size_val){    // if value has changed, send it to the front for filtering
       size_pot_val = curr_size_val;
       var pot_data = {time: time_pot_val, size: size_pot_val}
