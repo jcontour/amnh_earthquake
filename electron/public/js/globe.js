@@ -140,8 +140,7 @@ var eq_color = function(time) {  // mapping color to time of eq
     if ( time > historical ){
         var color = d3.scaleLinear()
         .domain([today,thisyear])
-        // .range(["#FF0000","#FFFF50"])
-        .range(["#A52710","#FFD13F"])
+        .range(["#FFD13F","#A52710"])
         .clamp(true);
         return color(time)
     } else { return '#7F1200' }         // color for "history" earthquakes
@@ -151,7 +150,7 @@ var eq_time = function(time) {  // mapping time to filter values
     if ( time > historical ){
         var color = d3.scaleLinear()
         .domain([today,thisyear])
-        .range([1,6])
+        .range([6,1])
         .clamp(true);
         return Math.floor(color(time))
     } else { return 0 }         // time for "history" earthquakes
@@ -269,7 +268,7 @@ var isDescOpen = false;
 var showEQDesc = function(value){
     var text = value.split("|")
     var date = text[0].split(" ")
-    console.log(text)
+    // console.log(text)
 
     $('#eq-desc').html('<p>'+date[0]+" "+date[1]+" "+date[2]+" "+date[3]+" "+date[4]+'</p><p>'+text[1]+'</p>')
 

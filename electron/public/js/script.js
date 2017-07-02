@@ -260,8 +260,8 @@ app.main = (function() {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INIT 
 
 	var setupFilters = function(){
-		document.getElementById("nTime").value = "0";	//if there's no arduino, set the filters to min values
-		document.getElementById("nSize").value = "0";
+		document.getElementById("nTime").value = "1";	//if there's no arduino, set the filters to min values
+		document.getElementById("nSize").value = "1";
 	}
 
 	var init = function(){
