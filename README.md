@@ -44,4 +44,18 @@ This initial version of Earthquake Explorer was built in-browser using Chrome an
 
 1. Run electron app with `npm start`
 
+## Updating sidebar data
 
+Data for Definitions, Questions, and News Articles for sidebars is stored in `electron/public/data/defs_and_questions.json`. 
+Update info in that file to add or change content. Make sure to follow existing structure.
+
+News articles must be saved as image files due to lack of functionality in electron to easily read pdfs. 
+
+## Potential break points
+
+1. app.js line 133 function `getGlobeData()` makes call to *earthquake.usgs.gov* earthquake API.
+1. app.js line 230 request to *iris.edu/hq/api/json-dmc-evid-retm* to get list of RETM entries. 
+1. app.js line 135 function `findLatLon()` makes call to Google Maps API to find lat/lon of RETM locations. 
+1. app.js line 142 function `findWaveForm()` makes two calls in order to get RETM info and waveform:
+    1. Call to *service.iris.edu/fdsnws* to find information about earthquake listed. This service might be discontinued in the future.
+    1. Call to *service.iris.edu/irisws/timeseries* to retrieve waveform from specific date/time/location. 
