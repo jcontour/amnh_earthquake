@@ -86,6 +86,12 @@ var setupGlobe = function(){
                 showRETMView(id, eqid);
             }
         }
+
+        if (isRetmOpen) {
+            $('#retm-view').slideUp();
+            isRetmOpen = false;
+        }
+
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     // HOVER ACTION
@@ -252,15 +258,12 @@ var showRETMView = function(id, eqid){
 
     if(!isRetmOpen){
         $('#retm-view').slideDown()
-        isRetmOpen = true;
+        // isRetmOpen = true;
     }
 
     setTimeout(function(){
-        if(isRetmOpen) {
-            $('#retm-view').slideUp();
-            isRetmOpen = false;
-        }
-    }, 5000);
+        isRetmOpen = true;
+    }, 1000);
 }
 
 var isDescOpen = false;
